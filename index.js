@@ -1,9 +1,11 @@
+var slice = Array.prototype.slice
+
 exports.on = function(name, fn, context) {
   if (name == null || !fn) return this
 
   if (!this._events) this._events = {}
-  var events = this._events[name] || (this._events[name] = [])
-  events.push([fn, context])
+  var fns = this._events[name] || (this._events[name] = [])
+  fns.push([fn, context])
   return this
 }
 
@@ -24,8 +26,8 @@ exports.off = function(name, fn, context) {
 
   var names = name != null ? [name] : Object.keys(this._events)
   for (var i = 0, l = names.length; i < l; ++i) {
-    var events = this._events[names[i]]
-    if (events) this._events[names[i]] = events.filter(function(pair) {
+    var fns = this._events[names[i]]
+    if (fns) this._events[names[i]] = fns.filter(function(pair) {
       if (fn && pair[0] !== fn && pair[0].fn !== fn) return true
       if (context && pair[1] !== context) return true
       return false
@@ -37,14 +39,16 @@ exports.off = function(name, fn, context) {
 
 exports.trigger = function(name) {
   if (!this._events) return this
-  var events = this._events[name]
-  if (!events) return this
 
-  var args = Array.prototype.slice.call(arguments, 1)
-  for (var i = 0, l = events.length; i < l; ++i) {
-    var event = events[i]
+  var fns
+  if (fns = this._events[name]) trigger.call(this, fns, slice.call(arguments,1))
+  if (fns = this._events.all) trigger.call(this, fns, arguments)
+  return this
+}
+
+function trigger(fns, args) {
+  for (var i = 0, l = fns.length; i < l; ++i) {
+    var event = fns[i]
     event[0].apply(event[1] || this, args)
   }
-
-  return this
 }

@@ -520,6 +520,15 @@ describe("Concert", function() {
         obj.on("bar", function() {})
         obj.trigger("foo").must.equal(obj)
       })
+
+      it("must trigger \"all\" event with event name", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("all", fn)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+        fn.firstCall.args.must.eql(["foo"])
+      })
     })
 
     describe("given name and arguments", function() {
