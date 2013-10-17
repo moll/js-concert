@@ -339,6 +339,28 @@ describe("Concert", function() {
       })
     })
 
+    describe("given function", function() {
+      it("must unbind undefined context if given null", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, undefined)
+        obj.off(null, fn, null)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind null context if given undefined", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null)
+        obj.off(null, fn, undefined)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+    })
+
     describe("given name and context", function() {
       it("must unbind", function() {
         var obj = create()
@@ -416,7 +438,7 @@ describe("Concert", function() {
       })
     })
 
-    describe("given only context", function() {
+    describe("given context", function() {
       it("must unbind", function() {
         var obj = create()
         var context = {}
