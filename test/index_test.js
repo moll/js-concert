@@ -108,6 +108,17 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(context)
       })
     })
+
+    it("must be renameable", function() {
+      var obj = create()
+      obj.addEventListener = obj.on
+      delete obj.on
+      
+      var fn = Sinon.spy()
+      obj.addEventListener("foo", fn, context)
+      obj.trigger("foo")
+      fn.firstCall.thisValue.must.equal(context)
+    })
   })
 
   describe(".once", function() {
@@ -195,6 +206,34 @@ describe("Concert", function() {
         obj.trigger("foo")
         fn.firstCall.thisValue.must.equal(context)
       })
+    })
+
+    it("must be renameable", function() {
+      var obj = create()
+      obj.addEventListenerOnce = obj.once
+      delete obj.once
+
+      var fn = Sinon.spy()
+      obj.addEventListenerOnce("foo", fn)
+      obj.trigger("foo")
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must be renameable with both Concert.on and Concert.off", function() {
+      var obj = create()
+      obj.addEventListener = obj.on
+      delete obj.on
+      obj.addEventListenerOnce = obj.once
+      delete obj.once
+      obj.removeEventListener = obj.off
+      delete obj.off
+
+      var fn = Sinon.spy()
+      obj.addEventListenerOnce("foo", fn)
+      obj.trigger("foo")
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
     })
   })
 
@@ -509,6 +548,18 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
     })
+
+    it("must be renameable", function() {
+      var obj = create()
+      obj.removeEventListener = obj.off
+      delete obj.off
+
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.removeEventListener("foo")
+      obj.trigger("foo")
+      fn.callCount.must.equal(0)
+    })
   })
 
   describe(".trigger", function() {
@@ -562,6 +613,16 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
         fn.firstCall.args.must.eql([1, 2, 3])
       })
+    })
+
+    it("must be renameable", function() {
+      var obj = create()
+      obj.emit = obj.trigger
+
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.emit("foo")
+      fn.callCount.must.equal(1)
     })
   })
 })

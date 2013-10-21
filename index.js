@@ -1,6 +1,9 @@
 var slice = Array.prototype.slice
+module.exports = Concert
 
-exports.on = function(name, fn, context) {
+function Concert() {}
+
+Concert.prototype.on = function(name, fn, context) {
   if (name == null || !fn) return this
 
   if (!this._events) this._events = {}
@@ -9,16 +12,21 @@ exports.on = function(name, fn, context) {
   return this
 }
 
-exports.once = function(name, fn, context) {
+Concert.prototype.once = function(name, fn, context) {
   if (!fn) return this
 
   var self = this, called = 0
-  function once() {if (!called++) self.off(name, fn), fn.apply(this, arguments)}
+  function once() {
+    if (called++) return
+    Concert.prototype.off.call(self, name, fn)
+    fn.apply(this, arguments)
+  }
   once.fn = fn
-  return this.on(name, once, context)
+
+  return Concert.prototype.on.call(this, name, once, context)
 }
 
-exports.off = function(name, fn, context) {
+Concert.prototype.off = function(name, fn, context) {
   if (!this._events) return this
 
   if (!fn && !context)
@@ -37,7 +45,7 @@ exports.off = function(name, fn, context) {
   return this
 }
 
-exports.trigger = function(name) {
+Concert.prototype.trigger = function(name) {
   if (!this._events) return this
 
   var fns
@@ -52,3 +60,8 @@ function trigger(fns, args) {
     event[0].apply(event[1] || this, args)
   }
 }
+
+Concert.on = Concert.prototype.on
+Concert.once = Concert.prototype.once
+Concert.off = Concert.prototype.off
+Concert.trigger = Concert.prototype.trigger
