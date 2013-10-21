@@ -96,6 +96,50 @@ describe("Concert", function() {
         var obj = create()
         obj.on("foo", function() {}).must.equal(obj)
       })
+
+      it("must return self given null name", function() {
+        var obj = create()
+        obj.on(null, function() {}).must.equal(obj)
+      })
+    })
+
+    describe("given object", function() {
+      it("must bind all given", function() {
+        var obj = create()
+        var foo = Sinon.spy(), bar = Sinon.spy()
+        obj.on({foo: foo, bar: bar})
+        obj.trigger("foo")
+        foo.callCount.must.equal(1)
+        bar.callCount.must.equal(0)
+        obj.trigger("bar")
+        foo.callCount.must.equal(1)
+        bar.callCount.must.equal(1)
+      })
+
+      it("must bind to the obj's context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must return self", function() {
+        var obj = create()
+        obj.on({foo: function() {}}).must.equal(obj)
+      })
+    })
+
+    describe("given object and context", function() {
+      it("must bind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, context)
+        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(context)
+      })
     })
 
     describe("given name, function and context", function() {
@@ -122,6 +166,13 @@ describe("Concert", function() {
   })
 
   describe(".once", function() {
+    describe("given nothing", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.once().must.equal(obj)
+      })
+    })
+
     describe("given only name", function() {
       it("must not affect other events", function() {
         var obj = create()
@@ -146,19 +197,19 @@ describe("Concert", function() {
         obj.must.have.property("_events")
       })
 
+      it("must bind", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
       it("must not allow calling the event twice", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.once("foo", fn)
         obj.trigger("foo")
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-
-      it("must bind", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.once("foo", fn)
         obj.trigger("foo")
         fn.callCount.must.equal(1)
       })
@@ -194,6 +245,61 @@ describe("Concert", function() {
       it("must return self", function() {
         var obj = create()
         obj.once("foo", function() {}).must.equal(obj)
+      })
+
+      it("must return self given null name", function() {
+        var obj = create()
+        obj.once(null, function() {}).must.equal(obj)
+      })
+    })
+
+    describe("given object", function() {
+      it("must bind all given", function() {
+        var obj = create()
+        var foo = Sinon.spy(), bar = Sinon.spy()
+        obj.once({foo: foo, bar: bar})
+        obj.trigger("foo")
+        foo.callCount.must.equal(1)
+        bar.callCount.must.equal(0)
+        obj.trigger("bar")
+        foo.callCount.must.equal(1)
+        bar.callCount.must.equal(1)
+      })
+
+      it("must not allow calling the event twice", function() {
+        var obj = create()
+        var foo = Sinon.spy(), bar = Sinon.spy()
+        obj.once({foo: foo, bar: bar})
+        obj.trigger("foo")
+        obj.trigger("foo")
+        obj.trigger("bar")
+        obj.trigger("bar")
+        foo.callCount.must.equal(1)
+        bar.callCount.must.equal(1)
+      })
+
+      it("must bind to the obj's context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once({foo: fn})
+        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+    
+      it("must return self", function() {
+        var obj = create()
+        obj.once({foo: function() {}}).must.equal(obj)
+      })
+    })
+
+    describe("given object and context", function() {
+      it("must bind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.once({foo: fn}, context)
+        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(context)
       })
     })
 
@@ -375,6 +481,85 @@ describe("Concert", function() {
       it("must return self", function() {
         var obj = create()
         obj.off("foo", function() {}).must.equal(obj)
+      })
+    })
+
+    describe("given object", function() {
+      it("must unbind all given", function() {
+        var obj = create()
+        var foo = Sinon.spy(), bar = Sinon.spy()
+        obj.on({foo: foo, bar: bar})
+        obj.off({foo: foo, bar: bar})
+        obj.trigger("foo")
+        obj.trigger("bar")
+        foo.callCount.must.equal(0)
+        bar.callCount.must.equal(0)
+      })
+
+      it("must not unbind others with different functions", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn})
+        obj.off({foo: function() {}})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different names", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn})
+        obj.off({bar: fn})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must return self", function() {
+        var obj = create()
+        obj.off({foo: function() {}}).must.equal(obj)
+      })
+    })
+
+    describe("given object and context", function() {
+      it("must unbind all given", function() {
+        var obj = create()
+        var context = {}
+        var foo = Sinon.spy(), bar = Sinon.spy()
+        obj.on({foo: foo, bar: bar}, context)
+        obj.off({foo: foo, bar: bar}, context)
+        obj.trigger("foo")
+        obj.trigger("bar")
+        foo.callCount.must.equal(0)
+        bar.callCount.must.equal(0)
+      })
+
+      it("must not unbind others with different functions", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, context)
+        obj.off({foo: function() {}}, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different names", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, context)
+        obj.off({bar: fn}, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different contexts", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, {})
+        obj.off({foo: fn}, {})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
       })
     })
 
@@ -581,6 +766,14 @@ describe("Concert", function() {
         obj.on("bar", other)
         obj.trigger("foo")
         other.callCount.must.equal(0)
+      })
+
+      it("must trigger event named 0", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on(0, fn)
+        obj.trigger(0)
+        fn.callCount.must.equal(1)
       })
 
       it("must return self even if this._events doesn't exist", function() {
