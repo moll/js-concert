@@ -21,9 +21,10 @@ Concert.prototype.once = function once(name, fn, context) {
 
   var self = this, called = 0
   function fnOnce() {
+    "use strict"
     if (called++) return
     Concert.prototype.off.call(self, name, fn)
-    fn.apply(this, arguments)
+    return fn.apply(this, arguments)
   }
   fnOnce.fn = fn
 
@@ -60,16 +61,13 @@ Concert.prototype.trigger = function trigger(name) {
   if (!this._events) return this
 
   var fns
-  if (fns = this._events[name]) apply(fns, this, slice.call(arguments, 1))
-  if (fns = this._events.all) apply(fns, this, arguments)
+  if (fns = this._events[name]) apply(fns, slice.call(arguments, 1))
+  if (fns = this._events.all) apply(fns, arguments)
   return this
 }
 
-function apply(fns, self, args) {
-  for (var i = 0, l = fns.length; i < l; ++i) {
-    var event = fns[i]
-    event[0].apply(event[1] || self, args)
-  }
+function apply(fns, args) {
+  for (var i = 0, l = fns.length; i < l; ++i) fns[i][0].apply(fns[i][1], args)
 }
 
 Concert.on = Concert.prototype.on

@@ -1,6 +1,7 @@
 var _ = require("underscore")
 var Sinon = require("sinon")
 var Concert = require("..")
+var demand = require("must")
 
 describe("Concert", function() {
   function create() { return _.extend({}, Concert) }
@@ -51,12 +52,9 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
 
-      it("must bind to the obj's context", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn)
-        obj.trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
+      it("must bind to null or global context", function() {
+        function fn() { "use strict"; demand(this).equal(undefined) }
+        create().on("foo", fn).trigger("foo")
       })
       
       it("must bind twice if called again", function() {
@@ -116,13 +114,9 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
-      it("must bind to the obj's context", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on({foo: fn})
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-        fn.firstCall.thisValue.must.equal(obj)
+      it("must bind to null or global context", function() {
+        function fn() { "use strict"; demand(this).equal(undefined) }
+        create().on({foo: fn}).trigger("foo")
       })
 
       it("must return self", function() {
@@ -205,6 +199,11 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
 
+      it("must bind to null or global context", function() {
+        function fn() { "use strict"; demand(this).equal(undefined) }
+        create().once("foo", fn).trigger("foo")
+      })
+
       it("must not allow calling the event twice", function() {
         var obj = create()
         var fn = Sinon.spy()
@@ -233,14 +232,6 @@ describe("Concert", function() {
         obj.trigger("foo")
         other.callCount.must.equal(2)
       })
-
-      it("must bind to the obj's context", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.once("foo", fn)
-        obj.trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
-      })
     
       it("must return self", function() {
         var obj = create()
@@ -266,6 +257,11 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
+      it("must bind to null or global context", function() {
+        function fn() { "use strict"; demand(this).equal(undefined) }
+        create().once({foo: fn}).trigger("foo")
+      })
+
       it("must not allow calling the event twice", function() {
         var obj = create()
         var foo = Sinon.spy(), bar = Sinon.spy()
@@ -276,14 +272,6 @@ describe("Concert", function() {
         obj.trigger("bar")
         foo.callCount.must.equal(1)
         bar.callCount.must.equal(1)
-      })
-
-      it("must bind to the obj's context", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.once({foo: fn})
-        obj.trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
       })
     
       it("must return self", function() {
