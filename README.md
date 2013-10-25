@@ -1,7 +1,9 @@
 Concert.js
 ==========
 [![NPM version][npm-badge]](http://badge.fury.io/js/concert)
+[![Build status][travis-badge]](https://travis-ci.org/moll/js-concert)
 [npm-badge]: https://badge.fury.io/js/concert.png
+[travis-badge]: https://travis-ci.org/moll/js-concert.png?branch=master
 
 Concert.js is an **event library** for JavaScript and Node.js that implements
 the **observer pattern** (a.k.a publish/subscribe). This is a useful pattern for
