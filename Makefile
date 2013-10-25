@@ -19,8 +19,32 @@ pack:
 publish:
 	npm publish
 
+# NOTE: Sorry, mocumentation is not yet published.
+doc: doc.json
+	@mkdir -p doc
+	@~/Documents/Mocumentation/bin/mocument \
+		--type yui \
+		--title Concert.js \
+		tmp/doc/data.json > doc/API.md
+
+toc: doc.json
+	@~/Documents/Mocumentation/bin/mocument \
+		--type yui \
+		--template toc \
+		--include Concert \
+		--var api_url=https://github.com/moll/js-concert/blob/master/doc/API.md \
+		tmp/doc/data.json > tmp/TOC.md
+
+	echo "/^### \[Concert\]/,/^\$$/{/^#/r tmp/TOC.md\n/^\$$/!d;}" |\
+		sed -i "" -f /dev/stdin README.md
+
+doc.json:
+	@mkdir -p tmp
+	@yuidoc --exclude test,node_modules --parse-only --outdir tmp/doc .
+
 clean:
-	rm -f *.tgz
+	rm -f *.tgz tmp
 
 .PHONY: love test spec autotest
 .PHONY: pack publish clean
+.PHONY: doc toc doc.json
