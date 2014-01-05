@@ -12,8 +12,7 @@ Concert()
 ---------
 Concert is the main object or *module* that you can inject into your own
 objects to make them observables (also known as *event emitters* or
-*dispatchers*). You can then listen to events and trigger them on that
-object.
+*dispatchers*). You can then listen to and trigger events on that object.
 
 ```javascript
 var Concert = require("concert")
