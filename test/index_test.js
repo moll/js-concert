@@ -137,7 +137,7 @@ describe("Concert", function() {
     })
 
     describe("given name, function and context", function() {
-      it("must bind event", function() {
+      it("must bind", function() {
         var obj = create()
         var context = {}
         var fn = Sinon.spy()
@@ -156,6 +156,15 @@ describe("Concert", function() {
       obj.addEventListener("foo", fn, context)
       obj.trigger("foo")
       fn.firstCall.thisValue.must.equal(context)
+    })
+
+    // This was a bug in v0.1.337.
+    it("must allow names of Object.prototype's properties", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
     })
   })
 
@@ -292,7 +301,7 @@ describe("Concert", function() {
     })
 
     describe("given name, function and context", function() {
-      it("must bind event", function() {
+      it("must bind", function() {
         var obj = create()
         var context = {}
         var fn = Sinon.spy()
@@ -733,6 +742,20 @@ describe("Concert", function() {
       obj.trigger("foo")
       fn.callCount.must.equal(0)
     })
+
+    it("must unbind bound name of Object.prototype's properties", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.off("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(0)
+    })
+
+    it("must ignore names of Object.prototype's properties", function() {
+      var obj = create()
+      obj.off.bind(obj, "hasOwnProperty", function() {}).must.not.throw()
+    })
   })
 
   describe(".trigger", function() {
@@ -804,6 +827,27 @@ describe("Concert", function() {
       obj.on("foo", fn)
       obj.emit("foo")
       fn.callCount.must.equal(1)
+    })
+
+    it("must trigger names of Object.prototype's properties", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must not trigger if event name only in prototype", function() {
+      var obj = create()
+      _.extend(obj, Concert)
+      obj.on("foo", function() {}) // Let this._events be created.
+      obj.trigger("hasOwnProperty")
+    })
+
+    it("must not trigger if event \"all\" only in prototype", function() {
+      var obj = {_events: Object.create({all: {length: 1}})}
+      _.extend(obj, Concert)
+      obj.trigger("hasOwnProperty")
     })
   })
 })

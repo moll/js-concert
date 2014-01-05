@@ -1,4 +1,5 @@
 var slice = Array.prototype.slice
+var has = Object.prototype.hasOwnProperty
 module.exports = Concert
 
 /**
@@ -71,8 +72,8 @@ Concert.prototype.on = function on(name, fn, context) {
   if (unpack(on, this, name, fn, context)) return this
   if (!fn) return this
 
-  if (!this._events) this._events = {}
-  var fns = this._events[name] || (this._events[name] = [])
+  var events = this._events || (this._events = {})
+  var fns = has.call(events, name)? events[name] : (events[name] = [])
   fns.push([fn, context])
   return this
 }
@@ -180,9 +181,9 @@ function unpack(on, self, obj, fn, context) {
 Concert.prototype.trigger = function trigger(name) {
   if (!this._events) return this
 
-  var fns
-  if (fns = this._events[name]) apply(fns, slice.call(arguments, 1))
-  if (fns = this._events.all) apply(fns, arguments)
+  var events = this._events
+  if (has.call(events, name)) apply(events[name], slice.call(arguments, 1))
+  if (has.call(events, "all")) apply(events.all, arguments)
   return this
 }
 
