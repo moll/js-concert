@@ -22,6 +22,9 @@ pack:
 publish:
 	npm publish
 
+tag:
+	git tag "v$$(node -e 'console.log(require("./package").version)')"
+
 # NOTE: Sorry, mocumentation is not yet published.
 doc: doc.json
 	@mkdir -p doc
@@ -50,5 +53,6 @@ clean:
 
 .PHONY: love
 .PHONY: test spec autotest autospec
-.PHONY: pack publish clean
+.PHONY: pack publish tag
+.PHONY: clean
 .PHONY: doc toc doc.json
