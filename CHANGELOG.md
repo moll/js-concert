@@ -1,4 +1,4 @@
-## Unreleased
+## 1.0.0 (Mar 21, 2014)
 - Defines the internal `_events` property as [non-enumerable][for-in].
 
 [for-in]: http://www.ecma-international.org/ecma-262/5.1/#sec-12.6.4
