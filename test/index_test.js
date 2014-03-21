@@ -58,7 +58,7 @@ describe("Concert", function() {
         function fn() { "use strict"; demand(this).equal(undefined) }
         create().on("foo", fn).trigger("foo")
       })
-      
+
       it("must bind twice if called again", function() {
         var obj = create()
         var fn = Sinon.spy()
@@ -153,7 +153,7 @@ describe("Concert", function() {
       var obj = create()
       obj.addEventListener = obj.on
       delete obj.on
-      
+
       var fn = Sinon.spy()
       obj.addEventListener("foo", fn, context)
       obj.trigger("foo")
@@ -225,7 +225,7 @@ describe("Concert", function() {
         obj.trigger("foo")
         fn.callCount.must.equal(1)
       })
-      
+
       it("must bind twice if called again", function() {
         var obj = create()
         var fn = Sinon.spy()
@@ -245,7 +245,7 @@ describe("Concert", function() {
         obj.trigger("foo")
         other.callCount.must.equal(2)
       })
-    
+
       it("must return self", function() {
         var obj = create()
         obj.once("foo", function() {}).must.equal(obj)
@@ -286,7 +286,7 @@ describe("Concert", function() {
         foo.callCount.must.equal(1)
         bar.callCount.must.equal(1)
       })
-    
+
       it("must return self", function() {
         var obj = create()
         obj.once({foo: function() {}}).must.equal(obj)
