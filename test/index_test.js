@@ -38,11 +38,13 @@ describe("Concert", function() {
     })
 
     describe("given name and function", function() {
-      it("must create this._events", function() {
+      it("must create non-enumerable this._events", function() {
         var obj = create()
         obj.on("foo", function() {})
-        obj.must.have.property("_events")
+        obj.must.have.nonenumerable("_events")
       })
+
+      it("must leave this._events configurable and writable")
 
       it("must bind", function() {
         var obj = create()
@@ -194,11 +196,13 @@ describe("Concert", function() {
     })
 
     describe("given name and function", function() {
-      it("must create this._events", function() {
+      it("must create non-enumerable this._events", function() {
         var obj = create()
         obj.once("foo", function() {})
-        obj.must.have.property("_events")
+        obj.must.have.nonenumerable("_events")
       })
+
+      it("must leave this._events configurable and writable")
 
       it("must bind", function() {
         var obj = create()

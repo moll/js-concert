@@ -72,7 +72,10 @@ Concert.prototype.on = function on(name, fn, context) {
   if (unpack(on, this, name, fn, context)) return this
   if (!fn) return this
 
-  var events = this._events || (this._events = {})
+  var events = this._events || Object.defineProperty(this, "_events", {
+    value: {}, configurable: true, writable: true
+  })._events
+
   var fns = has.call(events, name)? events[name] : (events[name] = [])
   fns.push([fn, context])
   return this
