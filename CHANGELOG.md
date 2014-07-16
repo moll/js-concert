@@ -1,3 +1,9 @@
+## Unreleased
+- Calls event handlers in the context of the object by default if a context
+  wasn't explicitly set.  
+  This matches how Backbone.js's, Node.js's EventEmitter and DOM event handlers
+  work.
+
 ## 1.0.0 (Mar 21, 2014)
 - Defines the internal `_events` property as [non-enumerable][for-in].
 

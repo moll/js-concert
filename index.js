@@ -42,7 +42,7 @@ function Concert() {}
 /**
  * Add a `listener` for `event`.  
  * Optionally specify the listener's `context` (value of `this`). Defaults to
- * the global object or `undefined` under [strict mode][strict].  
+ * the object listened on.  
  * Returns `this`.
  *
  * You can also specify **multiple events** at once by passing an object whose
@@ -54,8 +54,6 @@ function Concert() {}
  *
  * The listener will be called with any arguments passed to
  * [`trigger`](#Concert.trigger).
- *
- * [strict]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
  *
  * @example
  * music.on("cowbell", function() { console.log("Cluck!") })
@@ -99,7 +97,6 @@ Concert.prototype.once = function once(name, fn, context) {
 
   var self = this, called = 0
   function fnOnce() {
-    "use strict"
     if (called++) return
     Concert.prototype.off.call(self, name, fn)
     return fn.apply(this, arguments)
@@ -187,13 +184,14 @@ Concert.prototype.trigger = function trigger(name) {
   if (!this._events) return this
 
   var events = this._events
-  if (has.call(events, name)) apply(events[name], slice.call(arguments, 1))
-  if (has.call(events, "all")) apply(events.all, arguments)
+  if (has.call(events, name)) apply(events[name], this, slice.call(arguments,1))
+  if (has.call(events, "all")) apply(events.all, this, arguments)
   return this
 }
 
-function apply(fns, args) {
-  for (var i = 0, l = fns.length; i < l; ++i) fns[i][0].apply(fns[i][1], args)
+function apply(fns, context, args) {
+  for (var i = 0, l = fns.length; i < l; ++i)
+    fns[i][0].apply(fns[i][1] || context, args)
 }
 
 Concert.on = Concert.prototype.on

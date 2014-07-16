@@ -1,7 +1,6 @@
 var _ = require("underscore")
 var Sinon = require("sinon")
 var Concert = require("..")
-var demand = require("must")
 
 describe("Concert", function() {
   function create() { return _.extend({}, Concert) }
@@ -54,9 +53,9 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
 
-      it("must bind to null or global context", function() {
-        function fn() { "use strict"; demand(this).equal(undefined) }
-        create().on("foo", fn).trigger("foo")
+      it("must bind to object context by default", function() {
+        var obj = create()
+        obj.on("foo", function() { this.must.equal(obj) }).trigger("foo")
       })
 
       it("must bind twice if called again", function() {
@@ -116,9 +115,9 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
-      it("must bind to null or global context", function() {
-        function fn() { "use strict"; demand(this).equal(undefined) }
-        create().on({foo: fn}).trigger("foo")
+      it("must bind to object context by default", function() {
+        var obj = create()
+        obj.on({foo: function() { this.must.equal(obj) }}).trigger("foo")
       })
 
       it("must return self", function() {
@@ -212,9 +211,9 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
 
-      it("must bind to null or global context", function() {
-        function fn() { "use strict"; demand(this).equal(undefined) }
-        create().once("foo", fn).trigger("foo")
+      it("must bind to object context by default", function() {
+        var obj = create()
+        obj.once("foo", function() { this.must.equal(obj) }).trigger("foo")
       })
 
       it("must not allow calling the event twice", function() {
@@ -270,9 +269,9 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
-      it("must bind to null or global context", function() {
-        function fn() { "use strict"; demand(this).equal(undefined) }
-        create().once({foo: fn}).trigger("foo")
+      it("must bind to object context by default", function() {
+        var obj = create()
+        obj.once({foo: function() { this.must.equal(obj) }}).trigger("foo")
       })
 
       it("must not allow calling the event twice", function() {

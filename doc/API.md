@@ -73,7 +73,7 @@ obj.off({add: view.onAdd, remove: view.onRemove}, context)
 ### Concert.on(event, listener, context)
 Add a `listener` for `event`.  
 Optionally specify the listener's `context` (value of `this`). Defaults to
-the global object or `undefined` under [strict mode][strict].  
+the object listened on.  
 Returns `this`.
 
 You can also specify **multiple events** at once by passing an object whose
@@ -85,8 +85,6 @@ Listen to the special `all` event to be called when any event is triggered:
 
 The listener will be called with any arguments passed to
 [`trigger`](#Concert.trigger).
-
-[strict]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
 
 **Examples**:
 ```javascript
