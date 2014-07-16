@@ -150,6 +150,8 @@ Concert.prototype.off = function off(name, fn, context) {
   var names = name != null ? [name] : Object.keys(this._events)
   for (var i = 0, l = names.length; i < l; ++i) {
     var fns = this._events[names[i]]
+
+    /* jshint loopfunc:true */
     if (fns) this._events[names[i]] = fns.filter(function(fnAndContext) {
       if (fn && fnAndContext[0] !== fn && fnAndContext[0].fn !== fn) return true
       if (context && fnAndContext[1] !== context) return true
