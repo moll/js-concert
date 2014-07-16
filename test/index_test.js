@@ -154,7 +154,7 @@ describe("Concert", function() {
       obj.addEventListener = obj.on
       delete obj.on
 
-      var fn = Sinon.spy()
+      var fn = Sinon.spy(), context = {}
       obj.addEventListener("foo", fn, context)
       obj.trigger("foo")
       fn.firstCall.thisValue.must.equal(context)
@@ -567,7 +567,6 @@ describe("Concert", function() {
     describe("given function", function() {
       it("must unbind undefined context if given null", function() {
         var obj = create()
-        var context = {}
         var fn = Sinon.spy()
         obj.on("foo", fn, undefined)
         obj.off(null, fn, null)
@@ -577,7 +576,6 @@ describe("Concert", function() {
 
       it("must unbind null context if given undefined", function() {
         var obj = create()
-        var context = {}
         var fn = Sinon.spy()
         obj.on("foo", fn, null)
         obj.off(null, fn, undefined)
