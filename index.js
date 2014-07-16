@@ -159,12 +159,6 @@ Concert.prototype.off = function off(name, fn, context) {
   return this
 }
 
-function unpack(on, self, obj, fn, context) {
-  if (!obj || typeof obj != "object") return
-  for (var name in obj) on.call(self, name, obj[name], fn)
-  return true
-}
-
 /**
  * Trigger `event` and optionally pass any extra arguments to the listeners.  
  * Returns `this`.
@@ -189,12 +183,18 @@ Concert.prototype.trigger = function trigger(name) {
   return this
 }
 
-function apply(fns, context, args) {
-  for (var i = 0, l = fns.length; i < l; ++i)
-    fns[i][0].apply(fns[i][1] || context, args)
-}
-
 Concert.on = Concert.prototype.on
 Concert.once = Concert.prototype.once
 Concert.off = Concert.prototype.off
 Concert.trigger = Concert.prototype.trigger
+
+function unpack(on, self, obj, fn, context) {
+  if (!obj || typeof obj != "object") return
+  for (var name in obj) on.call(self, name, obj[name], fn)
+  return true
+}
+
+function apply(fns, context, args) {
+  for (var i = 0, l = fns.length; i < l; ++i)
+    fns[i][0].apply(fns[i][1] || context, args)
+}
