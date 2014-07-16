@@ -1,6 +1,6 @@
 {
 	"name": "concert",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "An event library that implements the observer pattern (a.k.a publish/subscribe). Similar to Node's EventEmitter and Backbone.Events, but independent, minimal and light-weight.",
 	"keywords": [
 		"bind",

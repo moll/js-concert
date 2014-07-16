@@ -1,4 +1,4 @@
-## Unreleased
+## 1.1.0 (Jul 16, 2014)
 - Calls event handlers in the context of the object by default if a context
   wasn't explicitly set.  
   This matches how Backbone.js's, Node.js's EventEmitter and DOM event handlers
