@@ -1,4 +1,4 @@
-## Unreleased
+## 1.2.0 (Sep 29, 2014)
 - `Concert.prototype.off` no longer deletes `this._events`, but sets it to
   `null`.  
   This allows for easier inheriting from an object that has `_events` set ---
