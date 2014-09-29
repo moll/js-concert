@@ -363,11 +363,18 @@ describe("Concert", function() {
         fn2.callCount.must.equal(0)
       })
 
-      it("must delete this._events", function() {
-        var obj = create()
+      it("must not unshadow inherited events", function() {
+        var parent = create()
+        var fn = Sinon.spy()
+        parent.on("foo", fn)
+
+        var obj = Object.create(parent)
+        obj._events = null
         obj.on("foo", function() {})
+
         obj.off()
-        obj.must.not.have.property("_events")
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
       })
 
       it("must return self", function() {

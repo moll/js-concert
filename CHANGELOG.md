@@ -1,3 +1,9 @@
+## Unreleased
+- `Concert.prototype.off` no longer deletes `this._events`, but sets it to
+  `null`.  
+  This allows for easier inheriting from an object that has `_events` set ---
+  parent's events won't be unshadowed by accident.
+
 ## 1.1.0 (Jul 16, 2014)
 - Calls event handlers in the context of the object by default if a context
   wasn't explicitly set.  

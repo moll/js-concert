@@ -141,8 +141,11 @@ Concert.prototype.off = function off(name, fn, context) {
   if (!this._events) return this
   if (unpack(off, this, name, fn, context)) return this
 
-  if (!fn && !context)
-    return name != null ? delete this._events[name] : delete this._events, this
+  if (!fn && !context) {
+    if (name == null) this._events = null
+    else delete this._events[name]
+    return this
+  }
 
   var names = name != null ? [name] : Object.keys(this._events)
   for (var i = 0, l = names.length; i < l; ++i) {
