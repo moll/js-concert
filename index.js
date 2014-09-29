@@ -123,11 +123,11 @@ Concert.prototype.once = function once(name, fn, context) {
  * // Remove listeners fn of event "foo":
  * obj.off("foo", fn)
  * // Remove listener fn bound to context listening to event "foo":
- * obj.off("foo", fn, context) 
+ * obj.off("foo", fn, context)
  * // Remove all listeners bound to context:
- * obj.off(null, null, context) 
+ * obj.off(null, null, context)
  * // Remove all listeners fn listening to any event:
- * obj.off(null, fn) 
+ * obj.off(null, fn)
  * // Remove multiple listeners together:
  * obj.off({add: view.onAdd, remove: view.onRemove}, context)
  *
