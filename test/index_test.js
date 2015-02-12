@@ -67,19 +67,19 @@ describe("Concert", function() {
         fn.callCount.must.equal(2)
       })
 
-      it("must not bind given null name", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on(null, fn)
-        obj.trigger("null")
-        fn.callCount.must.equal(0)
-      })
-
       it("must not bind given undefined name", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.on(undefined, fn)
         obj.trigger("undefined")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must not bind given null name", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on(null, fn)
+        obj.trigger("null")
         fn.callCount.must.equal(0)
       })
 
