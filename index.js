@@ -192,7 +192,7 @@ Concert.off = Concert.prototype.off
 Concert.trigger = Concert.prototype.trigger
 
 function unpack(on, self, obj, fn, context) {
-  if (!obj || typeof obj != "object") return
+  if (obj == null || typeof obj != "object") return
   for (var name in obj) on.call(self, name, obj[name], fn)
   return true
 }
