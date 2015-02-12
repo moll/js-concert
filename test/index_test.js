@@ -55,7 +55,9 @@ describe("Concert", function() {
 
       it("must bind to object context by default", function() {
         var obj = create()
-        obj.on("foo", function() { this.must.equal(obj) }).trigger("foo")
+        var fn = Sinon.spy()
+        obj.on("foo", fn).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
       })
 
       it("must bind twice if called again", function() {
@@ -102,6 +104,31 @@ describe("Concert", function() {
       })
     })
 
+    describe("given name, function and context", function() {
+      it("must bind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(context)
+      })
+
+      it("must bind to object context given undefined context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, undefined).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must bind to object context given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+    })
+
     describe("given object", function() {
       it("must bind all given", function() {
         var obj = create()
@@ -117,7 +144,9 @@ describe("Concert", function() {
 
       it("must bind to object context by default", function() {
         var obj = create()
-        obj.on({foo: function() { this.must.equal(obj) }}).trigger("foo")
+        var fn = Sinon.spy()
+        obj.on({foo: fn}).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
       })
 
       it("must return self", function() {
@@ -135,16 +164,19 @@ describe("Concert", function() {
         obj.trigger("foo")
         fn.firstCall.thisValue.must.equal(context)
       })
-    })
 
-    describe("given name, function and context", function() {
-      it("must bind", function() {
+      it("must bind to object context given undefined context", function() {
         var obj = create()
-        var context = {}
         var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.trigger("foo")
-        fn.firstCall.thisValue.must.equal(context)
+        obj.on({foo: fn}, undefined).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must bind to object context given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, null).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
       })
     })
 
@@ -256,6 +288,31 @@ describe("Concert", function() {
       })
     })
 
+    describe("given name, function and context", function() {
+      it("must bind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.once("foo", fn, context)
+        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(context)
+      })
+
+      it("must bind to object context given undefined context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn, undefined).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must bind to object context given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn, null).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+    })
+
     describe("given object", function() {
       it("must bind all given", function() {
         var obj = create()
@@ -301,16 +358,19 @@ describe("Concert", function() {
         obj.trigger("foo")
         fn.firstCall.thisValue.must.equal(context)
       })
-    })
 
-    describe("given name, function and context", function() {
-      it("must bind", function() {
+      it("must bind to object context given undefined context", function() {
         var obj = create()
-        var context = {}
         var fn = Sinon.spy()
-        obj.once("foo", fn, context)
-        obj.trigger("foo")
-        fn.firstCall.thisValue.must.equal(context)
+        obj.once({foo: fn}, undefined).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must bind to object context given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once({foo: fn}, null).trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
       })
     })
 
@@ -491,6 +551,180 @@ describe("Concert", function() {
       })
     })
 
+    describe("given name and context", function() {
+      it("must unbind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", function() {}, context)
+        obj.off("foo", null, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must not unbind others with different contexts", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, {})
+        obj.off("foo", null, {})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different names", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.off("bar", null, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must unbind given undefined context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, undefined)
+        obj.off("foo", null, undefined)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null)
+        obj.off("foo", null, null)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind undefined contexts given null context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, undefined)
+        obj.off("foo", null, null)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind null contexts given undefined context", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null)
+        obj.off("foo", null, undefined)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+    })
+
+    describe("given name, function and context", function() {
+      it("must unbind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.off("foo", fn, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind functions bound with \"once\"", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.once("foo", fn, context)
+        obj.off("foo", fn, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must not unbind others with different functions", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.off("foo", function() {}, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different contexts", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, {})
+        obj.off("foo", fn, {})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must return self", function() {
+        var obj = create()
+        obj.off("foo", function() {}, {}).must.equal(obj)
+      })
+    })
+
+    describe("given function", function() {
+      it("must unbind undefined context if given null", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, undefined)
+        obj.off(null, fn, null)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind null context if given undefined", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null)
+        obj.off(null, fn, undefined)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+    })
+
+    describe("given function and context", function() {
+      it("must unbind", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.off(null, fn, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must unbind functions bound with \"once\"", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.once("foo", fn, context)
+        obj.off(null, fn, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
+      it("must not unbind others with different functions", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.on("foo", fn, context)
+        obj.off(null, function() {}, context)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must not unbind others with different contexts", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, {})
+        obj.off(null, fn, {})
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+    })
+
     describe("given object", function() {
       it("must unbind all given", function() {
         var obj = create()
@@ -570,103 +804,6 @@ describe("Concert", function() {
       })
     })
 
-    describe("given function", function() {
-      it("must unbind undefined context if given null", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, undefined)
-        obj.off(null, fn, null)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must unbind null context if given undefined", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, null)
-        obj.off(null, fn, undefined)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-    })
-
-    describe("given name and context", function() {
-      it("must unbind", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", function() {}, context)
-        obj.off("foo", null, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must not unbind others with different contexts", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, {})
-        obj.off("foo", null, {})
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-
-      it("must not unbind others with different names", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.off("bar", null, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-    })
-
-    describe("given name, function and context", function() {
-      it("must unbind", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.off("foo", fn, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must unbind functions bound with \"once\"", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.once("foo", fn, context)
-        obj.off("foo", fn, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must not unbind others with different functions", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.off("foo", function() {}, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-
-      it("must not unbind others with different contexts", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, {})
-        obj.off("foo", fn, {})
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.off("foo", function() {}, {}).must.equal(obj)
-      })
-    })
-
     describe("given context", function() {
       it("must unbind", function() {
         var obj = create()
@@ -693,47 +830,6 @@ describe("Concert", function() {
         var fn = Sinon.spy()
         obj.on("foo", fn, {})
         obj.off(null, null, {})
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-    })
-
-    describe("given function and context", function() {
-      it("must unbind", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.off(null, fn, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must unbind functions bound with \"once\"", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.once("foo", fn, context)
-        obj.off(null, fn, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must not unbind others with different functions", function() {
-        var obj = create()
-        var context = {}
-        var fn = Sinon.spy()
-        obj.on("foo", fn, context)
-        obj.off(null, function() {}, context)
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-      })
-
-      it("must not unbind others with different contexts", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, {})
-        obj.off(null, fn, {})
         obj.trigger("foo")
         fn.callCount.must.equal(1)
       })
