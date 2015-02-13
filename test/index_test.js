@@ -85,22 +85,21 @@ describe("Concert", function() {
     })
 
     describe("given nothing", function() {
-      it("must return self", function() {
+      it("must throw TypeError", function() {
         var obj = create()
-        obj.on().must.equal(obj)
-      })
-
-      it("must not bind", function() {
-        var obj = create()
-        obj.on()
+        var err
+        try { obj.on() } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/name/i)
         obj.must.not.have.property("_events")
       })
     })
 
     describe("given only name", function() {
       it("must throw TypeError", function() {
+        var obj = create()
         var err
-        try { create().on("foo") } catch (ex) { err = ex }
+        try { obj.on("foo") } catch (ex) { err = ex }
         err.must.be.an.instanceof(TypeError)
         err.message.must.match(/function/i)
       })
@@ -110,11 +109,6 @@ describe("Concert", function() {
       it("must return self", function() {
         var obj = create()
         obj.on("foo", function() {}).must.equal(obj)
-      })
-
-      it("must return self given null name", function() {
-        var obj = create()
-        obj.on(null, function() {}).must.equal(obj)
       })
 
       it("must bind", function() {
@@ -139,22 +133,6 @@ describe("Concert", function() {
         obj.on("foo", fn)
         obj.trigger("foo")
         fn.callCount.must.equal(2)
-      })
-
-      it("must not bind given undefined name", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on(undefined, fn)
-        obj.trigger("undefined")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must not bind given null name", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on(null, fn)
-        obj.trigger("null")
-        fn.callCount.must.equal(0)
       })
 
       it("must bind given 0 name", function() {
@@ -216,11 +194,13 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
 
-      it("must throw TypeError given a non-function", function() {
+      it("must throw TypeError given null for a function", function() {
+        var obj = create()
         var err
-        try { create().on({foo: null}) } catch (ex) { err = ex }
+        try { obj.on({foo: null}) } catch (ex) { err = ex }
         err.must.be.an.instanceof(TypeError)
         err.message.must.match(/function/i)
+        obj.must.not.have.property("_events")
       })
     })
 
@@ -252,24 +232,24 @@ describe("Concert", function() {
 
   describe(".once", function() {
     describe("given nothing", function() {
-      it("must return self", function() {
+      it("must throw TypeError", function() {
         var obj = create()
-        obj.once().must.equal(obj)
-      })
-
-      it("must not bind", function() {
-        var obj = create()
-        obj.once()
+        var err
+        try { obj.once() } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/name/i)
         obj.must.not.have.property("_events")
       })
     })
 
     describe("given only name", function() {
       it("must throw TypeError", function() {
+        var obj = create()
         var err
-        try { create().once("foo") } catch (ex) { err = ex }
+        try { obj.once("foo") } catch (ex) { err = ex }
         err.must.be.an.instanceof(TypeError)
         err.message.must.match(/function/i)
+        obj.must.not.have.property("_events")
       })
     })
 
@@ -277,11 +257,6 @@ describe("Concert", function() {
       it("must return self", function() {
         var obj = create()
         obj.once("foo", function() {}).must.equal(obj)
-      })
-
-      it("must return self given null name", function() {
-        var obj = create()
-        obj.once(null, function() {}).must.equal(obj)
       })
 
       it("must bind once", function() {
@@ -424,11 +399,13 @@ describe("Concert", function() {
         obj.once({foo: function() { this.must.equal(obj) }}).trigger("foo")
       })
 
-      it("must throw TypeError given a non-function", function() {
+      it("must throw TypeError given null for a function", function() {
+        var obj = create()
         var err
-        try { create().once({foo: null}) } catch (ex) { err = ex }
+        try { obj.once({foo: null}) } catch (ex) { err = ex }
         err.must.be.an.instanceof(TypeError)
         err.message.must.match(/function/i)
+        obj.must.not.have.property("_events")
       })
     })
 
