@@ -1,9 +1,9 @@
 Concert.js API Documentation
 ============================
 ### [Concert](#Concert)
-- [off](#Concert.off)(event, listener, context)
-- [on](#Concert.on)(event, listener, context)
-- [once](#Concert.once)(event, listener, context)
+- [off](#Concert.off)(event, listener, [thisArg])
+- [on](#Concert.on)(event, listener, [thisArg])
+- [once](#Concert.once)(event, listener, [thisArg])
 - [trigger](#Concert.trigger)(event, [arguments...])
 
 
@@ -42,13 +42,13 @@ obj.removeEventListener = Concert.off
 ```
 
 <a name="Concert.off" />
-### Concert.off(event, listener, context)
-Remove previously added listeners by event name, by function, by context or
-by any combination.  
-Returns `this`.
+### Concert.off(event, listener, [thisArg])
+Remove previously added listeners by event name, by listener, by `thisArg`
+or by any combination.  
+Returns self.
 
 You can also specify **multiple events** at once by passing an object whose
-keys are event names and values functions.  Pass `context` then as the 2nd
+keys are event names and values functions.  Pass `thisArg` then as the 2nd
 parameter.
 
 **Examples**:
@@ -59,29 +59,31 @@ obj.off()
 obj.off("foo")
 // Remove listeners fn of event "foo":
 obj.off("foo", fn)
-// Remove listener fn bound to context listening to event "foo":
-obj.off("foo", fn, context) 
-// Remove all listeners bound to context:
-obj.off(null, null, context) 
+// Remove listener fn bound to thisArg listening to event "foo":
+obj.off("foo", fn, thisArg)
+// Remove all listeners bound to thisArg:
+obj.off(null, null, thisArg)
 // Remove all listeners fn listening to any event:
-obj.off(null, fn) 
+obj.off(null, fn)
 // Remove multiple listeners together:
-obj.off({add: view.onAdd, remove: view.onRemove}, context)
+obj.off({add: view.onAdd, remove: view.onRemove}, thisArg)
 ```
 
 <a name="Concert.on" />
-### Concert.on(event, listener, context)
+### Concert.on(event, listener, [thisArg])
 Add a `listener` for `event`.  
-Optionally specify the listener's `context` (value of `this`). Defaults to
-the object listened on.  
-Returns `this`.
+Optionally specify the listener's `this` value. Defaults to the object
+the event was triggered on.  
+Returns self.
 
 You can also specify **multiple events** at once by passing an object whose
-keys are event names and values functions.  Pass the optional `context`
-then as the 2nd parameter.
+keys are event names and values functions.  Pass the optional `this` then as
+the 2nd parameter.
 
 Listen to the special `all` event to be called when any event is triggered:
-`obj.on("all", function(event) {})`
+```javascript
+obj.on("all", function(event) {})
+```
 
 The listener will be called with any arguments passed to
 [`trigger`](#Concert.trigger).
@@ -93,15 +95,15 @@ collection.on({add: view.onAdd, remove: view.onRemove}, view)
 ```
 
 <a name="Concert.once" />
-### Concert.once(event, listener, context)
+### Concert.once(event, listener, [thisArg])
 Like [`on`](#Concert.on), but the listener is guaranteed to be called only
 once.  
-Returns `this`.
+Returns self.
 
 <a name="Concert.trigger" />
 ### Concert.trigger(event, [arguments...])
 Trigger `event` and optionally pass any extra arguments to the listeners.  
-Returns `this`.
+Returns self.
 
 Every event triggering also automatically triggers an `all` event with the
 event name prepended to other arguments.

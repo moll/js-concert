@@ -24,9 +24,9 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
 - **Inheritable** — You can inherit from you observables and add
   listeners later.  
   All event listeners will initially be inherited and then copied only once you
-  call `on`, `once` or `off`.  Eliminate an awful lot of computation by setting
-  your event listeners on your class's prototype. Read more on [inheritable
-  observables](#inheriting).
+  call `on`, `once` or `off` on the child instances. Eliminate an awful lot of
+  computation by setting your event listeners on your class's prototype. Read
+  more on [inheritable observables](#inheriting).
 - **Familiar** if you've ever used [Backbone.js][bb] or Node.js's
   [EventEmitter][ee].
 - Comes with a built-in [`once`] function to listen to an event only once and
@@ -155,15 +155,15 @@ classic.play() // => Will still log "Playing Tubular Bells.".
 
 API
 ---
-For extended documentation on all functions, please see the [Concert.js API
-Documentation][api].
+For extended documentation on all functions, please see the
+[Concert.js API Documentation][api].
 
 [api]: https://github.com/moll/js-concert/blob/master/doc/API.md
 
 ### [Concert](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert)
-- [off](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.off)(event, listener, context)
-- [on](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.on)(event, listener, context)
-- [once](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.once)(event, listener, context)
+- [off](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.off)(event, listener, [thisArg])
+- [on](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.on)(event, listener, [thisArg])
+- [once](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.once)(event, listener, [thisArg])
 - [trigger](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.trigger)(event, [arguments...])
 
 
