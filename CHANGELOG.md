@@ -11,8 +11,8 @@
   See the [README][] for more info on [inheritable
   observables](https://github.com/moll/js-concert#inheriting).
 
-- Throws `TypeError` when calling `on` or `once` without a name.
-- Throws `TypeError` when calling `on` or `once` without a listener function.
+- Throws `TypeError` when `on` or `once` called without a name.
+- Throws `TypeError` when `on` or `once` called without a listener function.
 
 [README]: https://github.com/moll/js-concert
 
