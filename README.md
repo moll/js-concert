@@ -32,12 +32,12 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
 - Comes with a built-in [`once`] function to listen to an event only once and
   then remove the listener automatically.  
 - **Rename or alias** any function to a name of your choice.   
-  Handy if you need to present a compatible or legacy API: `obj.addEventListener
-  = Concert.on`.
+  Handy if you need to present a compatible or legacy API:  
+  `obj.addEventListener = Concert.on`.
 - Special `all` event for catching all triggered events.  
   Useful also for **delegating or proxying** all events from one object to
   another.
-- Add listeners for **multiple events at once** with object syntax:
+- Add listeners for **multiple events at once** with object syntax:  
   `obj.on({change: onChange, save: onSave})`
 - Works well with namespaced event names such as `change:name`.  
   Because there's no limit to event names, you can easily create faux
