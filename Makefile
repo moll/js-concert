@@ -1,6 +1,11 @@
 NODE_OPTS :=
 TEST_OPTS :=
 
+# NOTE: Sorry, mocumentation is not yet published.
+MOCUMENT = ~/Documents/Mocumentation/bin/mocument
+MOCUMENT_OPTS = --type yui --title Concert.js
+GITHUB_URL = https://github.com/moll/js-concert
+
 love:
 	@echo "Feel like makin' love."
 
@@ -25,23 +30,18 @@ publish:
 tag:
 	git tag "v$$(node -e 'console.log(require("./package").version)')"
 
-# NOTE: Sorry, mocumentation is not yet published.
+
 doc: doc.json
 	@mkdir -p doc
-	@~/Documents/Mocumentation/bin/mocument \
-		--type yui \
-		--title Concert.js \
-		tmp/doc/data.json > doc/API.md
+	@$(MOCUMENT) $(MOCUMENT_OPTS) tmp/doc/data.json > doc/API.md
 
 toc: doc.json
-	@~/Documents/Mocumentation/bin/mocument \
-		--type yui \
+	@$(MOCUMENT) $(MOCUMENT_OPTS) \
 		--template toc \
-		--include Concert \
-		--var api_url=https://github.com/moll/js-concert/blob/master/doc/API.md \
+		--var api_url=$(GITHUB_URL)/blob/master/doc/API.md \
 		tmp/doc/data.json > tmp/TOC.md
 
-	echo "/^### \[Concert\]/,/^\$$/{/^#/r tmp/TOC.md\n/^\$$/!d;}" |\
+	@echo '/^API$$/,/^License$$/{/^API$$/{r tmp/TOC.md\na\\\n\\\n\\\n\n};/^License/!d;}' |\
 		sed -i "" -f /dev/stdin README.md
 
 doc.json:
