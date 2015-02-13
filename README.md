@@ -21,6 +21,12 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
   No unnecessary method pollution or large API surface area like with other
   libraries. No legacy method names either.
 - **Light-weight** with little code and **no external dependencies**.
+- **Inheritable** — You can inherit from you observables and add
+  listeners later.  
+  All event listeners will initially be inherited and then copied only once you
+  call `on`, `once` or `off`.  Eliminate an awful lot of computation by setting
+  your event listeners on your class's prototype. Read more on [inheritable
+  observables](#inheriting).
 - **Familiar** if you've ever used [Backbone.js][bb] or Node.js's
   [EventEmitter][ee].
 - Comes with a built-in [`once`] function to listen to an event only once and
@@ -81,7 +87,7 @@ _.extend(music, Concert)
 [underscore]: http://underscorejs.org
 [lodash]: http://lodash.com
 
-### Adding events to all instances
+### Enabling Concert on all instances
 Mix `Concert` in to your class's `prototype` to make each instance observable.
 ```javascript
 function Music() {}
@@ -94,7 +100,7 @@ var music = new Music
 music.on("cowbell", console.log)
 ```
 
-### Faux namespaces
+### Faux Namespaces
 Because there are no limits to event names, you can create faux namespaces by
 adding a separator, e.g `:`, to event names. Then trigger both the specific and
 general version in your application code and you're good to go. This happens to
@@ -106,6 +112,45 @@ model.trigger("change")
 ```
 
 [bb-model]: http://backbonejs.org/#Model
+
+<a name="inheriting" />
+### Inheritable Observables
+Concert.js supports inheriting from your observables without worrying you'll
+change the prototypes. Set up your event listeners once on your "class's"
+prototype and then, if need be, add or remove listeners.
+
+```javascript
+function Music(song) { this.song = song }
+
+_.extend(Music.prototype, Concert)
+
+Music.prototype.play = function() { this.trigger("play", this.song) }
+
+Music.prototype.on("play", console.log.bind(null, "Playing %s."))
+```
+
+Once you initialize your object, all of the event listeners will be ready
+without having to call a bunch of `on`s and `once`s in the constructor. This
+pattern saves you from an awful lot of unnecessary computation.
+
+```javascript
+var music = new Music("On Broadway")
+music.play() // => Will log "Playing On Broadway.".
+```
+
+You can then add listeners without worrying you'll change every instance in the
+system (as you would when you'd use Node.js's EventEmitter or Backbone's
+Events).
+
+```javascript
+var jam = new Music("The Way It Is")
+jam.off("play")
+jam.on("play", console.log.bind(null, "Jamming %s."))
+music.play() // => Will log "Jamming The Way It Is.".
+
+var classic = new Music("Tubular Bells")
+classic.play() // => Will still log "Playing Tubular Bells.".
+```
 
 
 API

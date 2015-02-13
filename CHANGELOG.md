@@ -1,3 +1,18 @@
+## Unreleased
+- You can now inherit from objects and change their event listeners without
+  affecting object prototypes.
+
+  All event listeners will initially be inherited and then copied only once you
+  call `on`, `once` or `off` on the child instances. For most use-cases you can
+  initialize your event listeners only once, e.g. on your class's prototype, and
+  then rely on inheritance to make them available. Eliminates an awful lot of
+  redundant computation.
+
+  See the [README][] for more info on [inheritable
+  observables](https://github.com/moll/js-concert#inheriting).
+
+[README]: https://github.com/moll/js-concert
+
 ## 1.2.0 (Sep 29, 2014)
 - `Concert.prototype.off` no longer deletes `this._events`, but sets it to
   `null`.  

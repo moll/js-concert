@@ -10,40 +10,116 @@ describe("Concert", function() {
   })
 
   describe(".on", function() {
+    it("must be renameable", function() {
+      var obj = create()
+      obj.addEventListener = obj.on
+      delete obj.on
+
+      var fn = Sinon.spy(), context = {}
+      obj.addEventListener("foo", fn, context)
+      obj.trigger("foo")
+      fn.firstCall.thisValue.must.equal(context)
+    })
+
+    // This was a bug in v0.1.337.
+    it("must allow names of Object.prototype's properties", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must inherit parent's events without changing parent", function() {
+      var obj = create()
+      var child = Object.create(obj)
+
+      var a = Sinon.spy()
+      obj.on("foo", a)
+      var b = Sinon.spy()
+      child.on("foo", b)
+
+      child.trigger("foo")
+      a.callCount.must.equal(1)
+      b.callCount.must.equal(1)
+
+      obj.trigger("foo")
+      a.callCount.must.equal(2)
+      b.callCount.must.equal(1)
+    })
+
+    it("must bind to inherited object by default", function() {
+      var obj = create()
+      var child = Object.create(obj)
+
+      var a = Sinon.spy()
+      obj.on("foo", a)
+      var b = Sinon.spy()
+      child.on("foo", b)
+
+      child.trigger("foo")
+      a.thisValues[0].must.equal(child)
+      b.thisValues[0].must.equal(child)
+    })
+
+    it("must not inherit parent's events after calling off", function() {
+      var obj = create()
+      var child = Object.create(obj)
+
+      var a = Sinon.spy()
+      obj.on("foo", a)
+      var b = Sinon.spy()
+      child.on("foo", b)
+      child.off()
+
+      child.on("foo", b)
+      child.trigger("foo")
+      a.callCount.must.equal(0)
+      b.callCount.must.equal(1)
+    })
+
+    it("must create non-enumerable this._events", function() {
+      var obj = create()
+      obj.on("foo", function() {})
+      obj.must.have.nonenumerable("_events")
+    })
+
     describe("given nothing", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.on().must.equal(obj)
+      })
+
       it("must not bind", function() {
         var obj = create()
         obj.on()
         obj.must.not.have.property("_events")
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.on().must.equal(obj)
-      })
     })
 
     describe("given only name", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.on("foo").must.equal(obj)
+      })
+
       it("must not bind", function() {
         var obj = create()
         obj.on("foo")
         obj.must.not.have.property("_events")
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.on("foo").must.equal(obj)
-      })
     })
 
     describe("given name and function", function() {
-      it("must create non-enumerable this._events", function() {
+      it("must return self", function() {
         var obj = create()
-        obj.on("foo", function() {})
-        obj.must.have.nonenumerable("_events")
+        obj.on("foo", function() {}).must.equal(obj)
       })
 
-      it("must leave this._events configurable and writable")
+      it("must return self given null name", function() {
+        var obj = create()
+        obj.on(null, function() {}).must.equal(obj)
+      })
 
       it("must bind", function() {
         var obj = create()
@@ -92,16 +168,6 @@ describe("Concert", function() {
         obj.trigger("0")
         fn.callCount.must.equal(1)
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.on("foo", function() {}).must.equal(obj)
-      })
-
-      it("must return self given null name", function() {
-        var obj = create()
-        obj.on(null, function() {}).must.equal(obj)
-      })
     })
 
     describe("given name, function and context", function() {
@@ -130,6 +196,11 @@ describe("Concert", function() {
     })
 
     describe("given object", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.on({foo: function() {}}).must.equal(obj)
+      })
+
       it("must bind all given", function() {
         var obj = create()
         var foo = Sinon.spy(), bar = Sinon.spy()
@@ -147,11 +218,6 @@ describe("Concert", function() {
         var fn = Sinon.spy()
         obj.on({foo: fn}).trigger("foo")
         fn.firstCall.thisValue.must.equal(obj)
-      })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.on({foo: function() {}}).must.equal(obj)
       })
     })
 
@@ -179,26 +245,6 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
     })
-
-    it("must be renameable", function() {
-      var obj = create()
-      obj.addEventListener = obj.on
-      delete obj.on
-
-      var fn = Sinon.spy(), context = {}
-      obj.addEventListener("foo", fn, context)
-      obj.trigger("foo")
-      fn.firstCall.thisValue.must.equal(context)
-    })
-
-    // This was a bug in v0.1.337.
-    it("must allow names of Object.prototype's properties", function() {
-      var obj = create()
-      var fn = Sinon.spy()
-      obj.on("hasOwnProperty", fn)
-      obj.trigger("hasOwnProperty")
-      fn.callCount.must.equal(1)
-    })
   })
 
   describe(".once", function() {
@@ -207,9 +253,20 @@ describe("Concert", function() {
         var obj = create()
         obj.once().must.equal(obj)
       })
+
+      it("must not bind", function() {
+        var obj = create()
+        obj.once()
+        obj.must.not.have.property("_events")
+      })
     })
 
     describe("given only name", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.once("foo").must.equal(obj)
+      })
+
       it("must not affect other events", function() {
         var obj = create()
         var other = Sinon.spy()
@@ -219,42 +276,66 @@ describe("Concert", function() {
         obj.trigger("foo")
         other.callCount.must.equal(2)
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.once("foo").must.equal(obj)
-      })
     })
 
     describe("given name and function", function() {
-      it("must create non-enumerable this._events", function() {
+      it("must return self", function() {
         var obj = create()
-        obj.once("foo", function() {})
-        obj.must.have.nonenumerable("_events")
+        obj.once("foo", function() {}).must.equal(obj)
       })
 
-      it("must leave this._events configurable and writable")
+      it("must return self given null name", function() {
+        var obj = create()
+        obj.once(null, function() {}).must.equal(obj)
+      })
 
-      it("must bind", function() {
+      it("must bind once", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.once("foo", fn)
+        obj.trigger("foo")
         obj.trigger("foo")
         fn.callCount.must.equal(1)
       })
 
       it("must bind to object context by default", function() {
         var obj = create()
-        obj.once("foo", function() { this.must.equal(obj) }).trigger("foo")
-      })
-
-      it("must not allow calling the event twice", function() {
-        var obj = create()
         var fn = Sinon.spy()
         obj.once("foo", fn)
         obj.trigger("foo")
-        obj.trigger("foo")
+        fn.firstCall.thisValue.must.equal(obj)
+      })
+
+      it("must bind to object context by default when inherited", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn)
+        var child = Object.create(obj)
+        child.trigger("foo")
+        fn.firstCall.thisValue.must.equal(child)
+      })
+
+      it("must bind once when inherited", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn)
+
+        var child = Object.create(obj)
+        child.trigger("foo")
+        child.trigger("foo")
         fn.callCount.must.equal(1)
+      })
+
+      it("must not change the parent when called on child", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn)
+
+        var child = Object.create(obj)
+        child.trigger("foo")
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(2)
       })
 
       it("must bind twice if called again", function() {
@@ -276,16 +357,6 @@ describe("Concert", function() {
         obj.trigger("foo")
         other.callCount.must.equal(2)
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.once("foo", function() {}).must.equal(obj)
-      })
-
-      it("must return self given null name", function() {
-        var obj = create()
-        obj.once(null, function() {}).must.equal(obj)
-      })
     })
 
     describe("given name, function and context", function() {
@@ -296,6 +367,16 @@ describe("Concert", function() {
         obj.once("foo", fn, context)
         obj.trigger("foo")
         fn.firstCall.thisValue.must.equal(context)
+      })
+
+      it("must bind once", function() {
+        var obj = create()
+        var context = {}
+        var fn = Sinon.spy()
+        obj.once("foo", fn, context)
+        obj.trigger("foo")
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
       })
 
       it("must bind to object context given undefined context", function() {
@@ -314,6 +395,11 @@ describe("Concert", function() {
     })
 
     describe("given object", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.once({foo: function() {}}).must.equal(obj)
+      })
+
       it("must bind all given", function() {
         var obj = create()
         var foo = Sinon.spy(), bar = Sinon.spy()
@@ -326,12 +412,7 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
-      it("must bind to object context by default", function() {
-        var obj = create()
-        obj.once({foo: function() { this.must.equal(obj) }}).trigger("foo")
-      })
-
-      it("must not allow calling the event twice", function() {
+      it("must bind once", function() {
         var obj = create()
         var foo = Sinon.spy(), bar = Sinon.spy()
         obj.once({foo: foo, bar: bar})
@@ -343,9 +424,9 @@ describe("Concert", function() {
         bar.callCount.must.equal(1)
       })
 
-      it("must return self", function() {
+      it("must bind to object context by default", function() {
         var obj = create()
-        obj.once({foo: function() {}}).must.equal(obj)
+        obj.once({foo: function() { this.must.equal(obj) }}).trigger("foo")
       })
     })
 
@@ -405,6 +486,11 @@ describe("Concert", function() {
 
   describe(".off", function() {
     describe("given nothing", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.off().must.equal(obj)
+      })
+
       it("must not create this._events if it didn't exist", function() {
         var obj = create()
         obj.off()
@@ -423,27 +509,55 @@ describe("Concert", function() {
         fn2.callCount.must.equal(0)
       })
 
-      it("must not unshadow inherited events", function() {
-        var parent = create()
+      it("must unbind inherited events without changing parent", function() {
+        var obj = create()
         var fn = Sinon.spy()
-        parent.on("foo", fn)
+        obj.on("foo", fn)
 
-        var obj = Object.create(parent)
-        obj._events = null
-        obj.on("foo", function() {})
-
-        obj.off()
-        obj.trigger("foo")
+        var child = Object.create(obj)
+        child.off()
+        child.trigger("foo")
         fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
       })
 
-      it("must return self", function() {
+      it("must unbind inherited and own events without changing parent",
+        function() {
         var obj = create()
-        obj.off().must.equal(obj)
+        var child = Object.create(obj)
+
+        var a = Sinon.spy()
+        obj.on("foo", a)
+        var b = Sinon.spy()
+        child.on("foo", b)
+
+        child.off()
+        child.trigger("foo")
+        a.callCount.must.equal(0)
+        b.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        a.callCount.must.equal(1)
+      })
+
+      it("must create non-enumerable this._events given inherited events",
+        function() {
+        var obj = create()
+        obj.on("foo", function() {})
+        var child = Object.create(obj)
+        child.off()
+        child.must.have.nonenumerable("_events")
       })
     })
 
     describe("given name", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.off("foo").must.equal(obj)
+      })
+
       it("must not create this._events if it didn't exist", function() {
         var obj = create()
         obj.off("foo")
@@ -477,13 +591,55 @@ describe("Concert", function() {
         fn.callCount.must.equal(1)
       })
 
-      it("must return self", function() {
+      it("must unbind inherited events without changing parent", function() {
         var obj = create()
-        obj.off("foo").must.equal(obj)
+        var fn = Sinon.spy()
+        obj.on("foo", fn)
+
+        var child = Object.create(obj)
+        child.off("foo")
+        child.trigger("foo")
+        fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must unbind inherited and own events without changing parent",
+        function() {
+        var obj = create()
+        var child = Object.create(obj)
+
+        var a = Sinon.spy()
+        obj.on("foo", a)
+        var b = Sinon.spy()
+        child.on("foo", b)
+
+        child.off("foo")
+        child.trigger("foo")
+        a.callCount.must.equal(0)
+        b.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        a.callCount.must.equal(1)
+      })
+
+      it("must create non-enumerable this._events given inherited events",
+        function() {
+        var obj = create()
+        obj.on("foo", function() {})
+        var child = Object.create(obj)
+        child.off("foo")
+        child.must.have.nonenumerable("_events")
       })
     })
 
     describe("given name and function", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.off("foo", function() {}).must.equal(obj)
+      })
+
       it("must not create this._events if it didn't exist", function() {
         var obj = create()
         obj.off("foo", function() {})
@@ -545,9 +701,35 @@ describe("Concert", function() {
         fn.callCount.must.equal(0)
       })
 
-      it("must return self", function() {
+      it("must unbind inherited events without changing parent", function() {
         var obj = create()
-        obj.off("foo", function() {}).must.equal(obj)
+        var fn = Sinon.spy()
+        obj.on("foo", fn)
+
+        var child = Object.create(obj)
+        child.off("foo", fn)
+        child.trigger("foo")
+        fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must unbind inherited and own events without changing parent",
+        function() {
+        var obj = create()
+        var child = Object.create(obj)
+
+        var fn = Sinon.spy()
+        obj.on("foo", fn)
+        child.on("foo", fn)
+
+        child.off("foo", fn)
+        child.trigger("foo")
+        fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
       })
     })
 
@@ -619,6 +801,11 @@ describe("Concert", function() {
     })
 
     describe("given name, function and context", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.off("foo", function() {}, {}).must.equal(obj)
+      })
+
       it("must unbind", function() {
         var obj = create()
         var context = {}
@@ -657,11 +844,6 @@ describe("Concert", function() {
         obj.trigger("foo")
         fn.callCount.must.equal(1)
       })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.off("foo", function() {}, {}).must.equal(obj)
-      })
     })
 
     describe("given function", function() {
@@ -674,6 +856,15 @@ describe("Concert", function() {
         fn.callCount.must.equal(0)
       })
 
+      it("must unbind functions bound with \"once\"", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn)
+        obj.off(null, fn)
+        obj.trigger("foo")
+        fn.callCount.must.equal(0)
+      })
+
       it("must unbind null context if given undefined", function() {
         var obj = create()
         var fn = Sinon.spy()
@@ -681,6 +872,37 @@ describe("Concert", function() {
         obj.off(null, fn, undefined)
         obj.trigger("foo")
         fn.callCount.must.equal(0)
+      })
+
+      it("must unbind inherited events without changing parent", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn)
+
+        var child = Object.create(obj)
+        child.off(null, fn)
+        child.trigger("foo")
+        fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must unbind inherited and own events without changing parent",
+        function() {
+        var obj = create()
+        var child = Object.create(obj)
+
+        var fn = Sinon.spy()
+        obj.on("foo", fn)
+        child.on("foo", fn)
+
+        child.off(null, fn)
+        child.trigger("foo")
+        fn.callCount.must.equal(0)
+
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
       })
     })
 
@@ -726,6 +948,11 @@ describe("Concert", function() {
     })
 
     describe("given object", function() {
+      it("must return self", function() {
+        var obj = create()
+        obj.off({foo: function() {}}).must.equal(obj)
+      })
+
       it("must unbind all given", function() {
         var obj = create()
         var foo = Sinon.spy(), bar = Sinon.spy()
@@ -753,11 +980,6 @@ describe("Concert", function() {
         obj.off({bar: fn})
         obj.trigger("foo")
         fn.callCount.must.equal(1)
-      })
-
-      it("must return self", function() {
-        var obj = create()
-        obj.off({foo: function() {}}).must.equal(obj)
       })
     })
 
@@ -863,64 +1085,112 @@ describe("Concert", function() {
   })
 
   describe(".trigger", function() {
-    describe("given name", function() {
-      it("must trigger event", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn)
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-        fn.firstCall.args.must.be.empty()
-      })
-
-      it("must not trigger other events", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        var other = Sinon.spy()
-        obj.on("foo", fn)
-        obj.on("bar", other)
-        obj.trigger("foo")
-        other.callCount.must.equal(0)
-      })
-
-      it("must trigger event named 0", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on(0, fn)
-        obj.trigger(0)
-        fn.callCount.must.equal(1)
-      })
-
-      it("must return self even if this._events doesn't exist", function() {
-        var obj = create()
-        obj.trigger("foo").must.equal(obj)
-      })
-
-      it("must return self if no matching event", function() {
-        var obj = create()
-        obj.on("bar", function() {})
-        obj.trigger("foo").must.equal(obj)
-      })
-
-      it("must trigger \"all\" event with event name", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("all", fn)
-        obj.trigger("foo")
-        fn.callCount.must.equal(1)
-        fn.firstCall.args.must.eql(["foo"])
-      })
+    it("must return self", function() {
+      var obj = create()
+      obj.on("foo", function() {})
+      obj.trigger("foo").must.equal(obj)
     })
 
-    describe("given name and arguments", function() {
-      it("must trigger event", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn)
-        obj.trigger("foo", 1, 2, 3)
-        fn.callCount.must.equal(1)
-        fn.firstCall.args.must.eql([1, 2, 3])
-      })
+    it("must return self even if this._events doesn't exist", function() {
+      var obj = create()
+      obj.trigger("foo").must.equal(obj)
+    })
+
+    it("must return self if no matching event", function() {
+      var obj = create()
+      obj.on("bar", function() {})
+      obj.trigger("foo").must.equal(obj)
+    })
+
+    it("must trigger event", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.be.empty()
+    })
+
+    it("must trigger inherited event", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      Object.create(obj).trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must not trigger other events", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      var other = Sinon.spy()
+      obj.on("foo", fn)
+      obj.on("bar", other)
+      obj.trigger("foo")
+      other.callCount.must.equal(0)
+    })
+
+    it("must trigger event named 0", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on(0, fn)
+      obj.trigger(0)
+      fn.callCount.must.equal(1)
+    })
+
+    it("must trigger \"all\" event with event name", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn)
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql(["foo"])
+    })
+
+    it("must trigger \"all\" for inherited events", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn)
+      Object.create(obj).trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must trigger event given arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.trigger("foo", 1, 2, 3)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2, 3])
+    })
+
+    it("must trigger listeners of Object.prototype's properties", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must trigger inherited listeners for Object.prototype's properties",
+      function() {
+      var obj = create()
+      var hasOwnProperty = Sinon.spy()
+      obj.on("hasOwnProperty", hasOwnProperty)
+
+      var child = Object.create(obj)
+      var toString = Sinon.spy()
+      child.on("toString", toString)
+
+      child.trigger("hasOwnProperty")
+      hasOwnProperty.callCount.must.equal(1)
+      child.trigger("toString")
+      toString.callCount.must.equal(1)
+    })
+
+    it("must not trigger if event name only in Object.prototype", function() {
+      var obj = create()
+      obj.on("foo", function() {}) // Let this._events be created.
+      obj.trigger("hasOwnProperty")
     })
 
     it("must be renameable", function() {
@@ -931,27 +1201,6 @@ describe("Concert", function() {
       obj.on("foo", fn)
       obj.emit("foo")
       fn.callCount.must.equal(1)
-    })
-
-    it("must trigger names of Object.prototype's properties", function() {
-      var obj = create()
-      var fn = Sinon.spy()
-      obj.on("hasOwnProperty", fn)
-      obj.trigger("hasOwnProperty")
-      fn.callCount.must.equal(1)
-    })
-
-    it("must not trigger if event name only in prototype", function() {
-      var obj = create()
-      _.extend(obj, Concert)
-      obj.on("foo", function() {}) // Let this._events be created.
-      obj.trigger("hasOwnProperty")
-    })
-
-    it("must not trigger if event \"all\" only in prototype", function() {
-      var obj = {_events: Object.create({all: {length: 1}})}
-      _.extend(obj, Concert)
-      obj.trigger("hasOwnProperty")
     })
   })
 })

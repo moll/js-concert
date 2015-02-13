@@ -68,13 +68,14 @@ function Concert() {}
 Concert.prototype.on = function on(name, fn, context) {
   if (name == null) return this
   if (unpack(on, this, name, fn, context)) return this
-  if (!fn) return this
+  if (fn == null) return this
 
-  var events = this._events || Object.defineProperty(this, "_events", {
-    value: {}, configurable: true, writable: true
-  })._events
+  var events = this._events
+  if (has.call(this, "_events")) events || (events = this._events = {})
+  else events = create(this, "_events", events)
 
-  var fns = has.call(events, name)? events[name] : (events[name] = [])
+  var fns = events[name]
+  if (!has.call(events, name)) fns = events[name] = fns ? fns.slice() : []
   fns.push([fn, context])
   return this
 }
@@ -93,17 +94,17 @@ Concert.prototype.on = function on(name, fn, context) {
 Concert.prototype.once = function once(name, fn, context) {
   if (name == null) return this
   if (unpack(once, this, name, fn, context)) return this
-  if (!fn) return this
+  if (fn == null) return this
 
-  var self = this, called = 0
   function fnOnce() {
-    if (called++) return
-    Concert.prototype.off.call(self, name, fn)
-    return fn.apply(this, arguments)
+    Concert.prototype.off.call(this, name, fn)
+    return fn.apply(context || this, arguments)
   }
-  fnOnce.fn = fn
 
-  return Concert.prototype.on.call(this, name, fnOnce, context)
+  fnOnce.__fn = fn
+  fnOnce.__context = context
+
+  return Concert.prototype.on.call(this, name, fnOnce)
 }
 
 /**
@@ -138,25 +139,23 @@ Concert.prototype.once = function once(name, fn, context) {
  * @param context
  */
 Concert.prototype.off = function off(name, fn, context) {
-  if (!this._events) return this
+  var events = this._events
+  if (events == null) return this
   if (unpack(off, this, name, fn, context)) return this
 
-  if (!fn && !context) {
-    if (name == null) this._events = null
-    else delete this._events[name]
-    return this
+  if (fn == null && context == null) {
+    if (name == null)
+      define(this, "_events", null)
+    else if (events[name] != null) {
+      if (!has.call(this, "_events")) events = create(this, "_events", events)
+      else delete events[name]
+      if (name in events) events[name] = null
+    }
   }
-
-  var names = name != null ? [name] : Object.keys(this._events)
-  for (var i = 0, l = names.length; i < l; ++i) {
-    var fns = this._events[names[i]]
-
-    /* jshint loopfunc:true */
-    if (fns) this._events[names[i]] = fns.filter(function(fnAndContext) {
-      if (fn && fnAndContext[0] !== fn && fnAndContext[0].fn !== fn) return true
-      if (context && fnAndContext[1] !== context) return true
-      return false
-    })
+  else {
+    if (!has.call(this, "_events")) events = create(this, "_events", events)
+    if (name != null) filter(events, name, fn, context)
+    else for (name in events) filter(events, name, fn, context)
   }
 
   return this
@@ -178,11 +177,11 @@ Concert.prototype.off = function off(name, fn, context) {
  * @param [arguments...]
  */
 Concert.prototype.trigger = function trigger(name) {
-  if (!this._events) return this
+  if (this._events == null) return this
 
   var events = this._events
-  if (has.call(events, name)) apply(events[name], this, slice.call(arguments,1))
-  if (has.call(events, "all")) apply(events.all, this, arguments)
+  if (events[name]) apply(events[name], this, slice.call(arguments,1))
+  if (events.all) apply(events.all, this, arguments)
   return this
 }
 
@@ -195,6 +194,32 @@ function unpack(on, self, obj, fn, context) {
   if (obj == null || typeof obj != "object") return
   for (var name in obj) on.call(self, name, obj[name], fn)
   return true
+}
+
+function define(obj, name, value) {
+  Object.defineProperty(obj, name, {value: value, configurable: 1, writable: 1})
+  return value
+}
+
+function create(obj, name, prototype) {
+  return define(obj, name, Object.create(prototype || null))
+}
+
+function filter(events, name, fn, context) {
+  var fns = events[name]
+  if (fns) events[name] = fns.filter(function(args) {
+    if (fn != null && !hasFunction(args, fn)) return true
+    if (context != null && !hasContext(args, context)) return true
+    return false
+  })
+}
+
+function hasFunction(args, fn) {
+  return args[0] === fn || args[0].__fn === fn
+}
+
+function hasContext(args, context) {
+  return (args[0].__context || args[1]) === context
 }
 
 function apply(fns, context, args) {
