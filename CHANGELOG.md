@@ -1,4 +1,4 @@
-## Unreleased
+## 2.0.0 (Feb 13, 2015)
 - You can now inherit from objects and change their event listeners without
   affecting object prototypes.
 
