@@ -30,7 +30,6 @@ publish:
 tag:
 	git tag "v$$(node -e 'console.log(require("./package").version)')"
 
-
 doc: doc.json
 	@mkdir -p doc
 	@$(MOCUMENT) $(MOCUMENT_OPTS) tmp/doc/data.json > doc/API.md
