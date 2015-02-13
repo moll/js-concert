@@ -98,15 +98,11 @@ describe("Concert", function() {
     })
 
     describe("given only name", function() {
-      it("must return self", function() {
-        var obj = create()
-        obj.on("foo").must.equal(obj)
-      })
-
-      it("must not bind", function() {
-        var obj = create()
-        obj.on("foo")
-        obj.must.not.have.property("_events")
+      it("must throw TypeError", function() {
+        var err
+        try { create().on("foo") } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/function/i)
       })
     })
 
@@ -219,6 +215,13 @@ describe("Concert", function() {
         obj.on({foo: fn}).trigger("foo")
         fn.firstCall.thisValue.must.equal(obj)
       })
+
+      it("must throw TypeError given a non-function", function() {
+        var err
+        try { create().on({foo: null}) } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/function/i)
+      })
     })
 
     describe("given object and context", function() {
@@ -262,19 +265,11 @@ describe("Concert", function() {
     })
 
     describe("given only name", function() {
-      it("must return self", function() {
-        var obj = create()
-        obj.once("foo").must.equal(obj)
-      })
-
-      it("must not affect other events", function() {
-        var obj = create()
-        var other = Sinon.spy()
-        obj.once("foo")
-        obj.on("foo", other)
-        obj.trigger("foo")
-        obj.trigger("foo")
-        other.callCount.must.equal(2)
+      it("must throw TypeError", function() {
+        var err
+        try { create().once("foo") } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/function/i)
       })
     })
 
@@ -427,6 +422,13 @@ describe("Concert", function() {
       it("must bind to object context by default", function() {
         var obj = create()
         obj.once({foo: function() { this.must.equal(obj) }}).trigger("foo")
+      })
+
+      it("must throw TypeError given a non-function", function() {
+        var err
+        try { create().once({foo: null}) } catch (ex) { err = ex }
+        err.must.be.an.instanceof(TypeError)
+        err.message.must.match(/function/i)
       })
     })
 

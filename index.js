@@ -1,5 +1,6 @@
 var slice = Array.prototype.slice
 var has = Object.prototype.hasOwnProperty
+var LISTENER_TYPE_ERR = "Listener should be a function"
 module.exports = Concert
 
 /**
@@ -70,7 +71,7 @@ function Concert() {}
 Concert.prototype.on = function on(name, fn, thisArg) {
   if (name == null) return this
   if (unpack(on, this, name, fn, thisArg)) return this
-  if (fn == null) return this
+  if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   var events = this._events
   if (has.call(this, "_events")) events || (events = this._events = {})
@@ -96,7 +97,7 @@ Concert.prototype.on = function on(name, fn, thisArg) {
 Concert.prototype.once = function once(name, fn, thisArg) {
   if (name == null) return this
   if (unpack(once, this, name, fn, thisArg)) return this
-  if (fn == null) return this
+  if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   function fnOnce() {
     Concert.prototype.off.call(this, name, fn)
