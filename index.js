@@ -79,8 +79,10 @@ Concert.prototype.on = function on(name, fn, thisArg) {
     events = create(this, "_events", events)
 
   var fns = events[name]
-  if (!has.call(events, name)) fns = events[name] = fns ? fns.slice() : []
+  if (fns == null) fns = events[name] = []
+  else if (!has.call(events, name)) fns = events[name] = fns.slice()
   fns.push([fn, thisArg])
+
   return this
 }
 

@@ -87,7 +87,8 @@ describe("Concert", function() {
     // This was a bug on Feb 15, 2015 related to setting _events to an object
     // inheriting from Object.prototype when it already existed on the object,
     // rather than null as usual.
-    it("must bind to Object.prototype's property after calling off", function(){
+    it("must bind to Object.prototype's property after unbinding all",
+      function(){
       var obj = create()
       obj.on("foo", function() {})
       obj.off()
@@ -95,6 +96,33 @@ describe("Concert", function() {
       var fn = Sinon.spy()
       obj.on("hasOwnProperty", fn)
       obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must bind after unbinding an inherited event", function(){
+      var obj = create()
+      function onFoo() {}
+      obj.on("foo", onFoo)
+
+      var child = Object.create(obj)
+      child.off("foo", onFoo)
+
+      var fn = Sinon.spy()
+      child.on("foo", fn)
+      child.trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
+    it("must bind after unbinding an inherited event and function", function(){
+      var obj = create()
+      obj.on("foo", function() {})
+
+      var child = Object.create(obj)
+      child.off("foo", fn)
+
+      var fn = Sinon.spy()
+      child.on("foo", fn)
+      child.trigger("foo")
       fn.callCount.must.equal(1)
     })
 
