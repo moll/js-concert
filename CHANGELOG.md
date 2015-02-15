@@ -1,4 +1,4 @@
-## Unreleased
+## 2.0.1 (Feb 15, 2015)
 - Fixes rebinding to events named like `Object.prototype`'s properties after
   unbinding all.
 - Fixes rebinding an inherited event that was previously unbound.
