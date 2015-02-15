@@ -75,8 +75,8 @@ Concert.prototype.on = function on(name, fn, thisArg) {
   if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   var events = this._events
-  if (has.call(this, "_events")) events || (events = this._events = {})
-  else events = create(this, "_events", events)
+  if (events == null || !has.call(this, "_events"))
+    events = create(this, "_events", events)
 
   var fns = events[name]
   if (!has.call(events, name)) fns = events[name] = fns ? fns.slice() : []

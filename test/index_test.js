@@ -84,6 +84,20 @@ describe("Concert", function() {
       obj.must.have.nonenumerable("_events")
     })
 
+    // This was a bug on Feb 15, 2015 related to setting _events to an object
+    // inheriting from Object.prototype when it already existed on the object,
+    // rather than null as usual.
+    it("must bind to Object.prototype's property after calling off", function(){
+      var obj = create()
+      obj.on("foo", function() {})
+      obj.off()
+
+      var fn = Sinon.spy()
+      obj.on("hasOwnProperty", fn)
+      obj.trigger("hasOwnProperty")
+      fn.callCount.must.equal(1)
+    })
+
     describe("given nothing", function() {
       it("must throw TypeError", function() {
         var obj = create()

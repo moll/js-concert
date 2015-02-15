@@ -1,3 +1,7 @@
+## Unreleased
+- Fixes an edge case related to binding to events named as `Object.prototype`'s
+  properties after having called `off`.
+
 ## 2.0.0 (Feb 13, 2015)
 - You can now inherit from objects and change their event listeners without
   affecting object prototypes.
