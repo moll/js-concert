@@ -3,6 +3,7 @@
   properties after having called `off`.
 - Fixes rebinding an inherited event that was previously unbound by calling
   `off(name)`.
+- Deletes an empty listener array from `_events` when the last event is unbound.
 
 ## 2.0.0 (Feb 13, 2015)
 - You can now inherit from objects and change their event listeners without

@@ -213,11 +213,19 @@ function create(obj, name, prototype) {
 
 function filter(events, name, fn, thisArg) {
   var fns = events[name]
-  if (fns) events[name] = fns.filter(function(args) {
+  if (fns == null) return
+
+  fns = fns.filter(function(args) {
     if (fn != null && !hasFunction(args, fn)) return true
     if (thisArg != null && !hasThis(args, thisArg)) return true
     return false
   })
+
+  if (fns.length == 0) {
+    delete events[name]
+    if (name in events) events[name] = null
+  }
+  else events[name] = fns
 }
 
 function hasFunction(args, fn) {
