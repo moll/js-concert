@@ -183,11 +183,10 @@ Concert.prototype.off = function off(name, fn, thisArg) {
  * @param [arguments...]
  */
 Concert.prototype.trigger = function trigger(name) {
-  if (this._events == null) return this
-
   var events = this._events
-  if (events[name]) apply(events[name], this, slice.call(arguments,1))
-  if (events.all) apply(events.all, this, arguments)
+  if (events == null) return this
+  if (events[name] != null) apply(events[name], this, slice.call(arguments, 1))
+  if (events.all != null) apply(events.all, this, arguments)
   return this
 }
 
