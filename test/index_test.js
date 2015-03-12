@@ -273,6 +273,16 @@ describe("Concert", function() {
   })
 
   describe(".once", function() {
+    // Not working as expected yet with the inheritance support.
+    xit("must not call twice when event triggered from handler", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", _.once(function() { obj.trigger("foo") }))
+      obj.once("foo", fn)
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
     describe("given nothing", function() {
       it("must throw TypeError", function() {
         var obj = create()
