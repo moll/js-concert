@@ -229,11 +229,11 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
 
-      it("must bind to object context given null context", function() {
+      it("must bind to null given null context", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.on("foo", fn, null).trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
+        fn.firstCall.must.have.property("thisValue", null)
       })
     })
 
@@ -289,11 +289,11 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
 
-      it("must bind to object context given null context", function() {
+      it("must bind to null given null context", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.on({foo: fn}, null).trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
+        fn.firstCall.must.have.property("thisValue", null)
       })
     })
   })
@@ -434,11 +434,11 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
 
-      it("must bind to object context given null context", function() {
+      it("must bind to null given null context", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.once("foo", fn, null).trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
+        fn.firstCall.must.have.property("thisValue", null)
       })
     })
 
@@ -504,11 +504,11 @@ describe("Concert", function() {
         fn.firstCall.thisValue.must.equal(obj)
       })
 
-      it("must bind to object context given null context", function() {
+      it("must bind to null given null context", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.once({foo: fn}, null).trigger("foo")
-        fn.firstCall.thisValue.must.equal(obj)
+        fn.firstCall.must.have.property("thisValue", null)
       })
     })
 
@@ -838,13 +838,13 @@ describe("Concert", function() {
         fn.callCount.must.equal(0)
       })
 
-      it("must unbind undefined contexts given null context", function() {
+      it("must not unbind undefined contexts given null context", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.on("foo", fn, undefined)
         obj.off("foo", null, null)
         obj.trigger("foo")
-        fn.callCount.must.equal(0)
+        fn.callCount.must.equal(1)
       })
 
       it("must unbind null contexts given undefined context", function() {
@@ -904,11 +904,20 @@ describe("Concert", function() {
     })
 
     describe("given function", function() {
-      it("must unbind undefined context if given null", function() {
+      it("must not unbind undefined context if given null", function() {
         var obj = create()
         var fn = Sinon.spy()
         obj.on("foo", fn, undefined)
         obj.off(null, fn, null)
+        obj.trigger("foo")
+        fn.callCount.must.equal(1)
+      })
+
+      it("must unbind null context if given undefined", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null)
+        obj.off(null, fn, undefined)
         obj.trigger("foo")
         fn.callCount.must.equal(0)
       })
@@ -918,15 +927,6 @@ describe("Concert", function() {
         var fn = Sinon.spy()
         obj.once("foo", fn)
         obj.off(null, fn)
-        obj.trigger("foo")
-        fn.callCount.must.equal(0)
-      })
-
-      it("must unbind null context if given undefined", function() {
-        var obj = create()
-        var fn = Sinon.spy()
-        obj.on("foo", fn, null)
-        obj.off(null, fn, undefined)
         obj.trigger("foo")
         fn.callCount.must.equal(0)
       })

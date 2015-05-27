@@ -73,7 +73,7 @@ obj.off({add: view.onAdd, remove: view.onRemove}, thisArg)
 ### Concert.on(event, listener, [thisArg])
 Add a `listener` for `event`.  
 Optionally specify the listener's `this` value. Defaults to the object
-the event was triggered on.  
+the event was triggered on when left undefined.  
 Returns self.
 
 You can also specify **multiple events** at once by passing an object whose

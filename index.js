@@ -44,7 +44,7 @@ function Concert() {}
 /**
  * Add a `listener` for `event`.  
  * Optionally specify the listener's `this` value. Defaults to the object
- * the event was triggered on.  
+ * the event was triggered on when left undefined.  
  * Returns self.
  *
  * You can also specify **multiple events** at once by passing an object whose
@@ -103,14 +103,15 @@ Concert.prototype.once = function once(name, fn, thisArg) {
   if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   function fnOnce() {
+    "use strict"
     Concert.prototype.off.call(this, name, fn)
-    fn.apply(thisArg || this, arguments)
+    fn.apply(thisArg === undefined ? this : thisArg, arguments)
   }
 
   fnOnce.__func = fn
   fnOnce.__this = thisArg
 
-  return Concert.prototype.on.call(this, name, fnOnce)
+  return Concert.prototype.on.call(this, name, fnOnce, undefined)
 }
 
 /**
@@ -149,7 +150,7 @@ Concert.prototype.off = function off(name, fn, thisArg) {
   if (events == null) return this
   if (unpack(off, this, name, fn, thisArg)) return this
 
-  if (fn == null && thisArg == null) {
+  if (fn == null && thisArg === undefined) {
     if (name == null)
       define(this, "_events", null)
     else if (events[name] != null) {
@@ -216,7 +217,7 @@ function filter(events, name, fn, thisArg) {
 
   fns = fns.filter(function(args) {
     if (fn != null && !hasFunction(args, fn)) return true
-    if (thisArg != null && !hasThis(args, thisArg)) return true
+    if (thisArg !== undefined && !hasThis(args, thisArg)) return true
     return false
   })
 
@@ -236,6 +237,8 @@ function hasThis(args, thisArg) {
 }
 
 function apply(fns, thisArg, args) {
-  for (var i = 0, l = fns.length; i < l; ++i)
-    fns[i][0].apply(fns[i][1] || thisArg, args)
+  for (var i = 0, l = fns.length; i < l; ++i) {
+    var context = fns[i][1]
+    fns[i][0].apply(context === undefined ? thisArg : context, args)
+  }
 }

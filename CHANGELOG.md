@@ -1,3 +1,21 @@
+## Unreleased
+- Allows binding a listener's `thisArg` to `null`.  
+
+  Using `null` will mean the event listner will be called in the `null` context.
+  In [JavaScript's strict mode][strict] that means `this === null`.  
+  ```javascript
+  model.on("change", onChange, null)
+  ```
+
+  As before, using `undefined` or leaving the context out will mean the event
+  listener will be called in the object's context. This is most useful when
+  setting up listeners on the object's prototype as v2.0.0 featured:
+  ```javascript
+  Model.prototype.on("change", fn)
+  ```
+
+[strict]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
+
 ## 2.0.1 (Feb 15, 2015)
 - Fixes rebinding to events named like `Object.prototype`'s properties after
   unbinding all.
