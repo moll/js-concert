@@ -1,4 +1,4 @@
-## Unreleased
+## 2.1.0 (May 27, 2015)
 - Allows binding a listener's `thisArg` to `null`.  
 
   Using `null` will mean the event listner will be called in the `null` context.
