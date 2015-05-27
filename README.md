@@ -42,10 +42,14 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
 - Works well with namespaced event names such as `change:name`.  
   Because there's no limit to event names, you can easily create faux
   namespaces.
+- Supports **ECMAScript 6's [Symbol][symbol]** in case you need to create events
+  a little more private.  
+  But really, that's an illusion. There's `Object.getOwnPropertySymbols`.
 - Thoroughly tested.
 
 [bb]: http://backbonejs.org
 [`once`]: https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.once
+[symbol]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol
 
 
 Installing
