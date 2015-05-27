@@ -184,6 +184,32 @@ describe("Concert", function() {
         obj.trigger("0")
         fn.callCount.must.equal(1)
       })
+
+      if (typeof Symbol != "undefined")
+      it("must bind to symbol", function() {
+        var obj = create()
+        var symbol = Symbol()
+        var fn = Sinon.spy()
+        obj.on(symbol, fn)
+        obj.trigger(symbol)
+        fn.callCount.must.equal(1)
+      })
+
+      if (typeof Symbol != "undefined")
+      it("must differentiate between two symbols", function() {
+        var obj = create()
+
+        var a = Symbol()
+        var b = Symbol()
+        var onA = Sinon.spy()
+        var onB = Sinon.spy()
+        obj.on(a, onA)
+        obj.on(b, onB)
+
+        obj.trigger(a)
+        onA.callCount.must.equal(1)
+        onB.callCount.must.equal(0)
+      })
     })
 
     describe("given name, function and context", function() {
@@ -1147,6 +1173,16 @@ describe("Concert", function() {
       var fn = Sinon.spy()
       obj.on("foo", fn)
       Object.create(obj).trigger("foo")
+      fn.callCount.must.equal(1)
+    })
+
+    if (typeof Symbol != "undefined")
+    it("must trigger inherited event given symbol", function() {
+      var obj = create()
+      var symbol = Symbol()
+      var fn = Sinon.spy()
+      obj.on(symbol, fn)
+      Object.create(obj).trigger(symbol)
       fn.callCount.must.equal(1)
     })
 
