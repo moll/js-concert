@@ -1,5 +1,6 @@
+var has = Object.hasOwnProperty
 var slice = Array.prototype.slice
-var has = Object.prototype.hasOwnProperty
+var concat = Array.prototype.concat.bind(Array.prototype)
 var NAME_TYPE_ERR = "Event name should be a string"
 var LISTENER_TYPE_ERR = "Event listener should be a function"
 module.exports = Concert
@@ -45,6 +46,7 @@ function Concert() {}
  * Add a `listener` for `event`.  
  * Optionally specify the listener's `this` value. Defaults to the object
  * the event was triggered on when left undefined.  
+ * Optionally specify additional arguments to be passed to the listener.  
  * Returns self.
  *
  * You can also specify **multiple events** at once by passing an object whose
@@ -62,16 +64,18 @@ function Concert() {}
  * @example
  * music.on("cowbell", function() { console.log("Cluck!") })
  * collection.on({add: view.onAdd, remove: view.onRemove}, view)
+ * model.on("change:name", view.onChange, view, "name")
  *
  * @static
  * @method on
  * @param event
  * @param listener
  * @param [thisArg]
+ * @param [arguments...]
  */
 Concert.prototype.on = function on(name, fn, thisArg) {
   if (name == null) throw new TypeError(NAME_TYPE_ERR)
-  if (unpack(on, this, name, fn, thisArg)) return this
+  if (unpack(on, this, arguments)) return this
   if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   var events = this._events
@@ -81,7 +85,7 @@ Concert.prototype.on = function on(name, fn, thisArg) {
   var fns = events[name]
   if (fns == null) fns = events[name] = []
   else if (!has.call(events, name)) fns = events[name] = fns.slice()
-  fns.push([fn, thisArg])
+  fns.push(slice.call(arguments, 1))
 
   return this
 }
@@ -96,10 +100,11 @@ Concert.prototype.on = function on(name, fn, thisArg) {
  * @param event
  * @param listener
  * @param [thisArg]
+ * @param [arguments...]
  */
 Concert.prototype.once = function once(name, fn, thisArg) {
   if (name == null) throw new TypeError(NAME_TYPE_ERR)
-  if (unpack(once, this, name, fn, thisArg)) return this
+  if (unpack(once, this, arguments)) return this
   if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   function fnOnce() {
@@ -111,7 +116,9 @@ Concert.prototype.once = function once(name, fn, thisArg) {
   fnOnce.__func = fn
   fnOnce.__this = thisArg
 
-  return Concert.prototype.on.call(this, name, fnOnce, undefined)
+  var args = [name, fnOnce, undefined]
+  if (arguments.length > 3) args.push.apply(args, slice.call(arguments, 3))
+  return Concert.prototype.on.apply(this, args)
 }
 
 /**
@@ -148,7 +155,7 @@ Concert.prototype.once = function once(name, fn, thisArg) {
 Concert.prototype.off = function off(name, fn, thisArg) {
   var events = this._events
   if (events == null) return this
-  if (unpack(off, this, name, fn, thisArg)) return this
+  if (unpack(off, this, arguments)) return this
 
   if (fn == null && thisArg === undefined) {
     if (name == null)
@@ -196,9 +203,17 @@ Concert.once = Concert.prototype.once
 Concert.off = Concert.prototype.off
 Concert.trigger = Concert.prototype.trigger
 
-function unpack(on, self, obj, fn, thisArg) {
-  if (obj == null || typeof obj != "object") return
-  for (var name in obj) on.call(self, name, obj[name], fn)
+function unpack(on, self, args) {
+  var obj = args[0]
+  if (obj == null || typeof obj != "object") return false
+
+  var name
+  if (args.length > 2) {
+    var argsArray = slice.call(args, 1)
+    for (name in obj) on.apply(self, concat(name, obj[name], argsArray))
+  }
+  else for (name in obj) on.call(self, name, obj[name], args[1])
+
   return true
 }
 
@@ -238,7 +253,12 @@ function hasThis(args, thisArg) {
 
 function apply(fns, thisArg, args) {
   for (var i = 0, l = fns.length; i < l; ++i) {
-    var context = fns[i][1]
-    fns[i][0].apply(context === undefined ? thisArg : context, args)
+    var fn = fns[i]
+
+    var argsArray = fn.length > 2 ? fn.slice(2) : null
+    if (argsArray == null) argsArray = args
+    else if (args.length > 0) argsArray.push.apply(argsArray, args)
+
+    fn[0].apply(fn[1] === undefined ? thisArg : fn[1], argsArray)
   }
 }

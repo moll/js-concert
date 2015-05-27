@@ -31,6 +31,7 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
   [EventEmitter][ee].
 - Comes with a built-in [`once`] function to listen to an event only once and
   then remove the listener automatically.  
+- Set a **listener's context** and optionally **extra arguments**.
 - **Rename or alias** any function to a name of your choice.   
   Handy if you need to present a compatible or legacy API:  
   `obj.addEventListener = Concert.on`.
@@ -137,6 +138,10 @@ Once you initialize your object, all of the event listeners will be ready
 without having to call a bunch of `on`s and `once`s in the constructor. This
 pattern saves you from an awful lot of unnecessary computation.
 
+Ensure the third argument, the listener's context, remains `undefined` when
+calling `Music.prototype.on`. The listener's context will then be set to
+any particular instance on which [`trigger`][] was called.
+
 ```javascript
 var music = new Music("On Broadway")
 music.play() // => Will log "Playing On Broadway.".
@@ -156,6 +161,23 @@ var classic = new Music("Tubular Bells")
 classic.play() // => Will still log "Playing Tubular Bells.".
 ```
 
+[`trigger`]: https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.trigger
+
+## Extra arguments
+If you'd like to use a single listener for multiple events, but need a way to
+still differentiate between events, make use of Concert.js's support for
+binding arguments:
+
+```javascript
+var song = new Music("The Way It Is")
+song.on("play", onPlay, undefined, "play")
+song.on("stop", onPlay, undefined, "stop")
+```
+
+Your `onStartOrStop` function will then be called in the context of `song` with
+its first argument as either `"play"` or `"stop"`. Any additional arguments
+given to [`trigger`] will come after the bound arguments.
+
 
 API
 ---
@@ -166,8 +188,8 @@ For extended documentation on all functions, please see the
 
 ### [Concert](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert)
 - [off](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.off)(event, listener, [thisArg])
-- [on](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.on)(event, listener, [thisArg])
-- [once](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.once)(event, listener, [thisArg])
+- [on](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.on)(event, listener, [thisArg], [arguments...])
+- [once](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.once)(event, listener, [thisArg], [arguments...])
 - [trigger](https://github.com/moll/js-concert/blob/master/doc/API.md#Concert.trigger)(event, [arguments...])
 
 

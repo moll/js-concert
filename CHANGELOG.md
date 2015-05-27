@@ -14,6 +14,12 @@
   Model.prototype.on("change", fn)
   ```
 
+- Allows binding additional arguments:
+
+  ```javascript
+  model.on("change", onChange, thisArg, 1, 2, 3)
+  ```
+
 [strict]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 
 ## 2.0.1 (Feb 15, 2015)

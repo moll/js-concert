@@ -2,8 +2,8 @@ Concert.js API Documentation
 ============================
 ### [Concert](#Concert)
 - [off](#Concert.off)(event, listener, [thisArg])
-- [on](#Concert.on)(event, listener, [thisArg])
-- [once](#Concert.once)(event, listener, [thisArg])
+- [on](#Concert.on)(event, listener, [thisArg], [arguments...])
+- [once](#Concert.once)(event, listener, [thisArg], [arguments...])
 - [trigger](#Concert.trigger)(event, [arguments...])
 
 
@@ -70,10 +70,11 @@ obj.off({add: view.onAdd, remove: view.onRemove}, thisArg)
 ```
 
 <a name="Concert.on" />
-### Concert.on(event, listener, [thisArg])
+### Concert.on(event, listener, [thisArg], [arguments...])
 Add a `listener` for `event`.  
 Optionally specify the listener's `this` value. Defaults to the object
 the event was triggered on when left undefined.  
+Optionally specify additional arguments to be passed to the listener.  
 Returns self.
 
 You can also specify **multiple events** at once by passing an object whose
@@ -92,10 +93,11 @@ The listener will be called with any arguments passed to
 ```javascript
 music.on("cowbell", function() { console.log("Cluck!") })
 collection.on({add: view.onAdd, remove: view.onRemove}, view)
+model.on("change:name", view.onChange, view, "name")
 ```
 
 <a name="Concert.once" />
-### Concert.once(event, listener, [thisArg])
+### Concert.once(event, listener, [thisArg], [arguments...])
 Like [`on`](#Concert.on), but the listener is guaranteed to be called only
 once.  
 Returns self.

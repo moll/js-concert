@@ -235,6 +235,20 @@ describe("Concert", function() {
         obj.on("foo", fn, null).trigger("foo")
         fn.firstCall.must.have.property("thisValue", null)
       })
+
+      it("must bind with argument", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null, 1).trigger("foo")
+        fn.firstCall.args.must.eql([1])
+      })
+
+      it("must bind with arguments", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on("foo", fn, null, 1, 2, 3).trigger("foo")
+        fn.firstCall.args.must.eql([1, 2, 3])
+      })
     })
 
     describe("given object", function() {
@@ -294,6 +308,20 @@ describe("Concert", function() {
         var fn = Sinon.spy()
         obj.on({foo: fn}, null).trigger("foo")
         fn.firstCall.must.have.property("thisValue", null)
+      })
+
+      it("must bind with argument", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, null, 1).trigger("foo")
+        fn.firstCall.args.must.eql([1])
+      })
+
+      it("must bind with arguments", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.on({foo: fn}, null, 1, 2, 3).trigger("foo")
+        fn.firstCall.args.must.eql([1, 2, 3])
       })
     })
   })
@@ -440,6 +468,20 @@ describe("Concert", function() {
         obj.once("foo", fn, null).trigger("foo")
         fn.firstCall.must.have.property("thisValue", null)
       })
+
+      it("must bind with argument", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn, null, 1).trigger("foo")
+        fn.firstCall.args.must.eql([1])
+      })
+
+      it("must bind with arguments", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once("foo", fn, null, 1, 2, 3).trigger("foo")
+        fn.firstCall.args.must.eql([1, 2, 3])
+      })
     })
 
     describe("given object", function() {
@@ -509,6 +551,20 @@ describe("Concert", function() {
         var fn = Sinon.spy()
         obj.once({foo: fn}, null).trigger("foo")
         fn.firstCall.must.have.property("thisValue", null)
+      })
+
+      it("must bind with argument", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once({foo: fn}, null, 1).trigger("foo")
+        fn.firstCall.args.must.eql([1])
+      })
+
+      it("must bind with arguments", function() {
+        var obj = create()
+        var fn = Sinon.spy()
+        obj.once({foo: fn}, null, 1, 2, 3).trigger("foo")
+        fn.firstCall.args.must.eql([1, 2, 3])
       })
     })
 
@@ -1204,6 +1260,42 @@ describe("Concert", function() {
       fn.callCount.must.equal(1)
     })
 
+    it("must trigger event with given argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.trigger("foo", 1)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1])
+    })
+
+    it("must trigger event with given arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn)
+      obj.trigger("foo", 1, 2, 3)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2, 3])
+    })
+
+    it("must trigger event with bound and given argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn, null, 1)
+      obj.trigger("foo", 2)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2])
+    })
+
+    it("must trigger event with bound and given arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("foo", fn, null, 1, 2, 3)
+      obj.trigger("foo", 4, 5, 6)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2, 3, 4, 5, 6])
+    })
+
     it("must trigger \"all\" event with event name", function() {
       var obj = create()
       var fn = Sinon.spy()
@@ -1213,21 +1305,75 @@ describe("Concert", function() {
       fn.firstCall.args.must.eql(["foo"])
     })
 
+    it("must trigger \"all\" event with given argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn)
+      obj.trigger("foo", 1)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql(["foo", 1])
+    })
+
+    it("must trigger \"all\" event with given array argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn)
+      obj.trigger("foo", [1])
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql(["foo", [1]])
+    })
+
+    it("must trigger \"all\" event with given arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn)
+      obj.trigger("foo", 1, 2, 3)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql(["foo", 1, 2, 3])
+    })
+
+    it("must trigger \"all\" event with bound argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn, null, 1)
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, "foo"])
+    })
+
+    it("must trigger \"all\" event with bound arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn, null, 1, 2, 3)
+      obj.trigger("foo")
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2, 3, "foo"])
+    })
+
+    it("must trigger \"all\" event with bound and given argument", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn, null, 1)
+      obj.trigger("foo", 2)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, "foo", 2])
+    })
+
+    it("must trigger \"all\" event with bound and given arguments", function() {
+      var obj = create()
+      var fn = Sinon.spy()
+      obj.on("all", fn, null, 1, 2, 3)
+      obj.trigger("foo", 4, 5, 6)
+      fn.callCount.must.equal(1)
+      fn.firstCall.args.must.eql([1, 2, 3, "foo", 4, 5, 6])
+    })
+
     it("must trigger \"all\" for inherited events", function() {
       var obj = create()
       var fn = Sinon.spy()
       obj.on("all", fn)
       Object.create(obj).trigger("foo")
       fn.callCount.must.equal(1)
-    })
-
-    it("must trigger event given arguments", function() {
-      var obj = create()
-      var fn = Sinon.spy()
-      obj.on("foo", fn)
-      obj.trigger("foo", 1, 2, 3)
-      fn.callCount.must.equal(1)
-      fn.firstCall.args.must.eql([1, 2, 3])
     })
 
     it("must trigger listeners of Object.prototype's properties", function() {
