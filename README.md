@@ -170,8 +170,8 @@ binding arguments:
 
 ```javascript
 var song = new Music("The Way It Is")
-song.on("play", onPlay, undefined, "play")
-song.on("stop", onPlay, undefined, "stop")
+song.on("play", onStartOrStop, undefined, "play")
+song.on("stop", onStartOrStop, undefined, "stop")
 ```
 
 Your `onStartOrStop` function will then be called in the context of `song` with
