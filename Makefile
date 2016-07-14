@@ -12,7 +12,7 @@ love:
 test:
 	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R dot $(TEST_OPTS)
 
-spec: 
+spec:
 	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R spec $(TEST_OPTS)
 
 autotest:
