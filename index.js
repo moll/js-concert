@@ -1,5 +1,5 @@
-var has = Object.hasOwnProperty
-var slice = Array.prototype.slice
+var hasOwn = Function.call.bind(Object.hasOwnProperty)
+var slice = Function.call.bind(Array.prototype.slice)
 var concat = Array.prototype.concat.bind(Array.prototype)
 var NAME_TYPE_ERR = "Event name should be a string"
 var LISTENER_TYPE_ERR = "Event listener should be a function"
@@ -79,13 +79,13 @@ Concert.prototype.on = function on(name, fn, thisArg) {
   if (fn == null) throw new TypeError(LISTENER_TYPE_ERR)
 
   var events = this._events
-  if (events == null || !has.call(this, "_events"))
+  if (events == null || !hasOwn(this, "_events"))
     events = create(this, "_events", events)
 
   var fns = events[name]
   if (fns == null) fns = events[name] = []
-  else if (!has.call(events, name)) fns = events[name] = fns.slice()
-  fns.push(slice.call(arguments, 1))
+  else if (!hasOwn(events, name)) fns = events[name] = fns.slice()
+  fns.push(slice(arguments, 1))
 
   return this
 }
@@ -117,7 +117,7 @@ Concert.prototype.once = function once(name, fn, thisArg) {
   fnOnce.__this = thisArg
 
   var args = [name, fnOnce, undefined]
-  if (arguments.length > 3) args.push.apply(args, slice.call(arguments, 3))
+  if (arguments.length > 3) args.push.apply(args, slice(arguments, 3))
   return Concert.prototype.on.apply(this, args)
 }
 
@@ -161,13 +161,13 @@ Concert.prototype.off = function off(name, fn, thisArg) {
     if (name == null)
       define(this, "_events", null)
     else if (events[name] != null) {
-      if (!has.call(this, "_events")) events = create(this, "_events", events)
+      if (!hasOwn(this, "_events")) events = create(this, "_events", events)
       else delete events[name]
       if (name in events) events[name] = null
     }
   }
   else {
-    if (!has.call(this, "_events")) events = create(this, "_events", events)
+    if (!hasOwn(this, "_events")) events = create(this, "_events", events)
     if (name != null) filter(events, name, fn, thisArg)
     else for (name in events) filter(events, name, fn, thisArg)
   }
@@ -193,7 +193,7 @@ Concert.prototype.off = function off(name, fn, thisArg) {
 Concert.prototype.trigger = function trigger(name) {
   var events = this._events
   if (events == null) return this
-  if (events[name] != null) apply(events[name], this, slice.call(arguments, 1))
+  if (events[name] != null) apply(events[name], this, slice(arguments, 1))
   if (events.all != null) apply(events.all, this, arguments)
   return this
 }
@@ -209,7 +209,7 @@ function unpack(on, self, args) {
 
   var name
   if (args.length > 2) {
-    var argsArray = slice.call(args, 1)
+    var argsArray = slice(args, 1)
     for (name in obj) on.apply(self, concat(name, obj[name], argsArray))
   }
   else for (name in obj) on.call(self, name, obj[name], args[1])
