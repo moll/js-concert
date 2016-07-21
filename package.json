@@ -35,8 +35,8 @@
 	"scripts": {"test": "make test"},
 
 	"devDependencies": {
-		"mocha": ">= 2 < 3",
-		"must": ">= 0.13 < 0.14",
+		"mocha": ">= 2.5.3 < 3",
+		"must": ">= 0.13.2 < 0.14",
 		"sinon": ">= 1.7.3 < 2",
 		"underscore": ">= 1.5.2 < 2",
 		"benchmark": ">= 1.0.0 < 2"
