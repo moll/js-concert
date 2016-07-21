@@ -1,9 +1,7 @@
 Concert.js
 ==========
-[![NPM version][npm-badge]](http://badge.fury.io/js/concert)
+[![NPM version][npm-badge]](https://www.npmjs.com/package/concert)
 [![Build status][travis-badge]](https://travis-ci.org/moll/js-concert)
-[npm-badge]: https://badge.fury.io/js/concert.png
-[travis-badge]: https://travis-ci.org/moll/js-concert.png?branch=master
 
 Concert.js is an **event library** for JavaScript and Node.js that implements
 the **observer pattern** (a.k.a publish/subscribe). This is a useful pattern for
@@ -12,6 +10,8 @@ the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
 [EventEmitter][ee] and [Backbone.Events][bb-events], but **independent**,
 **minimal** and **light-weight**.
 
+[npm-badge]: https://img.shields.io/npm/v/concert.svg
+[travis-badge]: https://travis-ci.org/moll/js-concert.png?branch=master
 [ee]: http://nodejs.org/api/events.html
 [bb-events]: http://backbonejs.org/#Events
 [mvc]: https://en.wikipedia.org/wiki/Model_View_Controller
