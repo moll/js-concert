@@ -1,3 +1,4 @@
+NODE = node
 NODE_OPTS :=
 TEST_OPTS :=
 
@@ -10,16 +11,16 @@ love:
 	@echo "Feel like makin' love."
 
 test:
-	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R dot $(TEST_OPTS)
+	@$(NODE) $(NODE_OPTS) ./node_modules/.bin/mocha -R dot $(TEST_OPTS)
 
 spec:
-	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R spec $(TEST_OPTS)
+	@$(NODE) $(NODE_OPTS) ./node_modules/.bin/mocha -R spec $(TEST_OPTS)
 
 autotest:
-	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R dot --watch $(TEST_OPTS)
+	@$(NODE) $(NODE_OPTS) ./node_modules/.bin/mocha -R dot --watch $(TEST_OPTS)
 
 autospec:
-	@node $(NODE_OPTS) ./node_modules/.bin/mocha -R spec --watch $(TEST_OPTS)
+	@$(NODE) $(NODE_OPTS) ./node_modules/.bin/mocha -R spec --watch $(TEST_OPTS)
 
 pack:
 	@file=$$(npm pack); echo "$$file"; tar tf "$$file"
@@ -28,7 +29,7 @@ publish:
 	npm publish
 
 tag:
-	git tag "v$$(node -e 'console.log(require("./package").version)')"
+	git tag "v$$($(NODE) -e 'console.log(require("./package").version)')"
 
 doc: doc.json
 	@mkdir -p doc
