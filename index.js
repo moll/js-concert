@@ -159,10 +159,13 @@ Concert.prototype.off = function off(name, fn, thisArg) {
 
   if (fn == null && thisArg === undefined) {
     if (name == null)
+      // When unbinding everything, just set a new _events. Stops the one in
+      // the prototype.
       define(this, "_events", null)
     else if (events[name] != null) {
       if (!hasOwn(this, "_events")) events = create(this, "_events", events)
       else delete events[name]
+      // If there are inherited events, mask them with null.
       if (name in events) events[name] = null
     }
   }
