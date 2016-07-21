@@ -7,8 +7,8 @@ Concert.js is an **event library** for JavaScript and Node.js that implements
 the **observer pattern** (a.k.a publish/subscribe). This is a useful pattern for
 creating decoupled architectures, event driven systems and is one key element in
 the [Model-View-Controller][mvc] pattern.  Concert.js similar to Node's
-[EventEmitter][ee] and [Backbone.Events][bb-events], but **independent**,
-**minimal** and **light-weight**.
+[EventEmitter][ee] and [Backbone.Events][bb-events], but **decoupled**,
+**minimal** and **light-weight**. Also supports **inherited listeners** for far better performance!
 
 [npm-badge]: https://img.shields.io/npm/v/concert.svg
 [travis-badge]: https://travis-ci.org/moll/js-concert.png?branch=master
