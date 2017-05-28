@@ -1,14 +1,13 @@
 Concert.js API Documentation
 ============================
 ### [Concert](#Concert)
-- [off](#Concert.off)(event, listener, [thisArg])
-- [on](#Concert.on)(event, listener, [thisArg], [arguments...])
-- [once](#Concert.once)(event, listener, [thisArg], [arguments...])
-- [trigger](#Concert.trigger)(event, [arguments...])
+- [.off](#Concert.off)(event, listener, [thisArg])
+- [.on](#Concert.on)(event, listener, [thisArg], [arguments...])
+- [.once](#Concert.once)(event, listener, [thisArg], [arguments...])
+- [.trigger](#Concert.trigger)(event, [arguments...])
 
 
-<a name="Concert" />
-Concert()
+Concert() <a name="Concert"></a>
 ---------
 Concert is the main object or *module* that you can inject into your own
 objects to make them observables (also known as *event emitters* or
@@ -41,8 +40,7 @@ obj.emit = Concert.trigger
 obj.removeEventListener = Concert.off
 ```
 
-<a name="Concert.off" />
-### Concert.off(event, listener, [thisArg])
+### Concert.off(event, listener, [thisArg]) <a name="Concert.off"></a>
 Remove previously added listeners by event name, by listener, by `thisArg`
 or by any combination.  
 Returns self.
@@ -69,8 +67,7 @@ obj.off(null, fn)
 obj.off({add: view.onAdd, remove: view.onRemove}, thisArg)
 ```
 
-<a name="Concert.on" />
-### Concert.on(event, listener, [thisArg], [arguments...])
+### Concert.on(event, listener, [thisArg], [arguments...]) <a name="Concert.on"></a>
 Add a `listener` for `event`.  
 Optionally specify the listener's `this` value. Defaults to the object
 the event was triggered on when left undefined.  
@@ -96,14 +93,12 @@ collection.on({add: view.onAdd, remove: view.onRemove}, view)
 model.on("change:name", view.onChange, view, "name")
 ```
 
-<a name="Concert.once" />
-### Concert.once(event, listener, [thisArg], [arguments...])
+### Concert.once(event, listener, [thisArg], [arguments...]) <a name="Concert.once"></a>
 Like [`on`](#Concert.on), but the listener is guaranteed to be called only
 once.  
 Returns self.
 
-<a name="Concert.trigger" />
-### Concert.trigger(event, [arguments...])
+### Concert.trigger(event, [arguments...]) <a name="Concert.trigger"></a>
 Trigger `event` and optionally pass any extra arguments to the listeners.  
 Returns self.
 
